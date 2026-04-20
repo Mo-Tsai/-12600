@@ -1,0 +1,6830 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0b0b0d">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="室裝刷題">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<title>乙級室裝 12600 刷題系統 · Mo Edition</title>
+<style>
+:root{
+  --bg:#0b0b0d;--surface:#15151a;--surface-2:#1d1d24;--surface-3:#272731;
+  --border:#2a2a34;--border-2:#3a3a46;
+  --text:#ececef;--muted:#8a8a95;--muted-2:#5a5a65;
+  --accent:#f59e0b;--accent-hover:#fbbf24;--accent-dim:rgba(245,158,11,.15);
+  --correct:#10b981;--correct-dim:rgba(16,185,129,.15);
+  --wrong:#ef4444;--wrong-dim:rgba(239,68,68,.15);
+  --hint:#60a5fa;--hint-dim:rgba(96,165,250,.12);
+  --trap:#a855f7;--trap-dim:rgba(168,85,247,.12);
+  --radius:12px;--radius-lg:16px;
+  --font:-apple-system,BlinkMacSystemFont,"PingFang TC","Noto Sans TC","Microsoft JhengHei",sans-serif;
+  --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  background:var(--bg);color:var(--text);font-family:var(--font);
+  font-size:16px;line-height:1.6;overflow-x:hidden;-webkit-font-smoothing:antialiased;
+  padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom);
+}
+button{font-family:inherit;cursor:pointer;border:none;outline:none}
+button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.hidden{display:none!important}
+.app{max-width:720px;margin:0 auto;padding:20px 16px 80px;min-height:100vh;position:relative}
+.screen{animation:fadeIn .2s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+
+/* ===== Header ===== */
+.topbar{display:flex;align-items:center;gap:10px;margin-bottom:18px;min-height:40px}
+.topbar h1{font-size:17px;font-weight:700;letter-spacing:.02em;flex:1}
+.topbar h1 .tag-mo{color:var(--accent);font-weight:500;margin-left:6px;font-size:13px}
+.icon-btn{background:var(--surface);color:var(--text);border:1px solid var(--border);width:36px;height:36px;border-radius:10px;display:inline-flex;align-items:center;justify-content:center;font-size:16px;transition:background .15s}
+.icon-btn:hover{background:var(--surface-2)}
+
+/* ===== Stats row ===== */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:20px}
+.stat{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:12px 10px;text-align:center}
+.stat .val{font-size:22px;font-weight:700;letter-spacing:-.02em;line-height:1.1}
+.stat .val.accent{color:var(--accent)}
+.stat .val.correct{color:var(--correct)}
+.stat .val.wrong{color:var(--wrong)}
+.stat .lbl{font-size:11px;color:var(--muted);margin-top:4px;letter-spacing:.05em}
+
+/* ===== Mode cards ===== */
+.section-title{font-size:13px;color:var(--muted);letter-spacing:.1em;margin:24px 0 10px;font-weight:500;text-transform:uppercase}
+.modes{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px}
+.mode{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px;text-align:left;color:var(--text);transition:all .15s;position:relative}
+.mode:hover{border-color:var(--accent);background:var(--surface-2)}
+.mode .emo{font-size:22px;display:block;margin-bottom:6px}
+.mode .ti{font-size:15px;font-weight:600;display:block;margin-bottom:2px}
+.mode .ds{font-size:12px;color:var(--muted);line-height:1.5}
+.mode .badge{position:absolute;top:10px;right:10px;background:var(--wrong-dim);color:var(--wrong);font-size:10px;padding:2px 6px;border-radius:4px;font-weight:600}
+
+/* ===== Category grid ===== */
+.cats{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+.cat-chip{background:var(--surface);border:1px solid var(--border);color:var(--text);padding:8px 12px;border-radius:999px;font-size:13px;transition:all .15s;display:inline-flex;align-items:center;gap:6px}
+.cat-chip:hover{background:var(--surface-2);border-color:var(--border-2)}
+.cat-chip.active{background:var(--accent);color:#000;border-color:var(--accent);font-weight:600}
+.cat-chip .n{opacity:.6;font-size:11px}
+.cat-chip.active .n{opacity:.8}
+
+/* ===== Actions ===== */
+.actions-row{display:flex;gap:8px;margin-top:20px;flex-wrap:wrap}
+.btn{background:var(--surface);color:var(--text);border:1px solid var(--border);padding:10px 14px;border-radius:10px;font-size:14px;transition:all .15s;font-weight:500}
+.btn:hover{background:var(--surface-2);border-color:var(--border-2)}
+.btn.primary{background:var(--accent);color:#000;border-color:var(--accent);font-weight:600}
+.btn.primary:hover{background:var(--accent-hover);border-color:var(--accent-hover)}
+.btn.danger{color:var(--wrong)}
+.btn.danger:hover{background:var(--wrong-dim);border-color:var(--wrong)}
+.btn.ghost{background:transparent}
+
+/* ===== Quiz header ===== */
+.quiz-top{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+.prog{flex:1}
+.prog .counter{font-size:13px;color:var(--muted);margin-bottom:4px;display:flex;justify-content:space-between;align-items:center}
+.prog .bar{height:4px;background:var(--surface-2);border-radius:2px;overflow:hidden}
+.prog .fill{height:100%;background:var(--accent);transition:width .3s ease}
+.timer{font-family:var(--mono);background:var(--surface);border:1px solid var(--border);padding:4px 10px;border-radius:8px;font-size:13px;font-weight:600}
+.timer.warn{color:var(--wrong);border-color:var(--wrong)}
+
+/* ===== Question card ===== */
+.qcard{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px;margin-bottom:14px}
+.qmeta{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap;align-items:center}
+.qtag{background:var(--surface-3);color:var(--muted);padding:3px 8px;border-radius:4px;font-size:11px;font-weight:500;letter-spacing:.03em}
+.qtag.type{background:var(--hint-dim);color:var(--hint)}
+.qtag.cat{background:var(--accent-dim);color:var(--accent)}
+.qtag.trap{background:var(--trap-dim);color:var(--trap)}
+.qtext{font-size:17px;font-weight:500;line-height:1.7;margin-bottom:16px;color:var(--text)}
+
+.opts{display:flex;flex-direction:column;gap:8px}
+.opt{display:flex;align-items:flex-start;gap:12px;background:var(--surface-2);border:1.5px solid var(--border);border-radius:var(--radius);padding:13px 14px;cursor:pointer;transition:all .15s;text-align:left;color:var(--text);min-height:52px;width:100%;font-family:inherit;font-size:15px;line-height:1.5}
+.opt:hover:not(.disabled){border-color:var(--border-2);background:var(--surface-3)}
+.opt.selected{border-color:var(--accent);background:var(--accent-dim)}
+.opt.correct{border-color:var(--correct);background:var(--correct-dim)}
+.opt.wrong{border-color:var(--wrong);background:var(--wrong-dim)}
+.opt.disabled{cursor:not-allowed}
+.opt .key{flex-shrink:0;width:26px;height:26px;border-radius:6px;background:var(--surface-3);display:inline-flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;font-family:var(--mono)}
+.opt.selected .key{background:var(--accent);color:#000}
+.opt.correct .key{background:var(--correct);color:#fff}
+.opt.wrong .key{background:var(--wrong);color:#fff}
+.opt .txt{flex:1}
+.opt .chk{display:none}
+.multi .opt .chk{display:inline-block;flex-shrink:0;width:18px;height:18px;border:2px solid var(--border-2);border-radius:3px;margin-top:3px;position:relative}
+.multi .opt.selected .chk{border-color:var(--accent);background:var(--accent)}
+.multi .opt.selected .chk::after{content:"✓";position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#000;font-size:12px;font-weight:900}
+.multi .opt.correct .chk{border-color:var(--correct);background:var(--correct)}
+.multi .opt.correct .chk::after{content:"✓";position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;font-weight:900}
+
+/* ===== Explanation ===== */
+.expl{margin-top:12px;padding:14px 16px;border-radius:var(--radius);background:var(--hint-dim);border-left:3px solid var(--hint);animation:fadeIn .2s}
+.expl.ok{background:var(--correct-dim);border-left-color:var(--correct)}
+.expl.no{background:var(--wrong-dim);border-left-color:var(--wrong)}
+.expl .result{font-weight:700;margin-bottom:8px;font-size:14px}
+.expl .result.ok{color:var(--correct)}
+.expl .result.no{color:var(--wrong)}
+.expl .hint-title{font-size:12px;color:var(--muted);margin-bottom:4px;font-weight:600;letter-spacing:.05em;text-transform:uppercase}
+.expl .hint-text{font-size:14px;line-height:1.6;color:var(--text);margin-bottom:10px}
+.expl .hint-text:last-child{margin-bottom:0}
+.expl .hint-text.mnemonic{background:var(--accent-dim);padding:8px 10px;border-radius:6px;color:var(--accent)}
+.expl .hint-text.trap{background:var(--trap-dim);padding:8px 10px;border-radius:6px;color:var(--trap)}
+
+/* ===== Bottom actions ===== */
+.bottom-actions{display:flex;gap:8px;position:sticky;bottom:max(20px,env(safe-area-inset-bottom));background:linear-gradient(to top,var(--bg) 70%,transparent);padding-top:10px;margin-top:16px;padding-bottom:env(safe-area-inset-bottom)}
+.bottom-actions .btn{flex:1;padding:16px;font-size:15px;min-height:52px}
+
+/* ===== Flashcard mode ===== */
+.flash{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:30px 24px;min-height:300px;display:flex;flex-direction:column;cursor:pointer;user-select:none}
+.flash .q{font-size:17px;font-weight:500;line-height:1.8;margin-bottom:20px;flex:1}
+.flash .ans{margin-top:auto;padding-top:20px;border-top:1px dashed var(--border);animation:fadeIn .2s}
+.flash .ans .label{font-size:11px;color:var(--muted);letter-spacing:.1em;font-weight:600;margin-bottom:6px}
+.flash .ans .correct-ans{color:var(--correct);font-weight:700;font-size:18px;margin-bottom:10px}
+.flash .ans .hint-txt{font-size:14px;color:var(--text);line-height:1.7}
+.flash .hint-reveal{text-align:center;color:var(--muted);font-size:13px;margin-top:auto;padding-top:20px}
+
+/* ===== Summary screen ===== */
+.summary-hero{text-align:center;padding:32px 0;background:linear-gradient(135deg,var(--surface),var(--surface-2));border:1px solid var(--border);border-radius:var(--radius-lg);margin-bottom:16px}
+.summary-hero .score{font-size:56px;font-weight:800;line-height:1;letter-spacing:-.03em}
+.summary-hero .score.pass{color:var(--correct)}
+.summary-hero .score.fail{color:var(--wrong)}
+.summary-hero .sub{font-size:13px;color:var(--muted);margin-top:4px}
+.summary-hero .verdict{font-size:14px;margin-top:12px;font-weight:600}
+.summary-hero .verdict.pass{color:var(--correct)}
+.summary-hero .verdict.fail{color:var(--wrong)}
+
+.sum-detail{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:16px}
+.sum-detail .row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:14px}
+.sum-detail .row:last-child{border-bottom:none}
+.sum-detail .row .lbl{color:var(--muted)}
+.sum-detail .row .val{font-weight:600}
+
+.wrong-list{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:16px}
+.wrong-list h3{font-size:14px;margin-bottom:12px;color:var(--muted)}
+.wrong-item{padding:10px 0;border-bottom:1px solid var(--border);font-size:13px;line-height:1.6}
+.wrong-item:last-child{border-bottom:none}
+.wrong-item .q{margin-bottom:4px}
+.wrong-item .a{color:var(--muted);font-size:12px}
+
+/* ===== Modal ===== */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(4px);z-index:50;display:flex;align-items:center;justify-content:center;padding:16px;animation:fadeIn .15s}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);max-width:520px;width:100%;max-height:85vh;overflow-y:auto;padding:20px}
+.modal h2{font-size:17px;margin-bottom:12px}
+.modal p{font-size:14px;color:var(--muted);margin-bottom:10px;line-height:1.6}
+.modal textarea{width:100%;min-height:180px;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px;color:var(--text);font-family:var(--mono);font-size:12px;resize:vertical}
+.modal textarea:focus{outline:none;border-color:var(--accent)}
+.modal .modal-actions{display:flex;gap:8px;margin-top:14px;justify-content:flex-end}
+.modal pre{background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:10px;font-size:11px;overflow-x:auto;margin:8px 0;font-family:var(--mono)}
+.modal kbd{background:var(--surface-3);padding:2px 6px;border-radius:4px;font-size:11px;font-family:var(--mono);border:1px solid var(--border-2)}
+
+.toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:var(--surface-3);border:1px solid var(--border-2);color:var(--text);padding:10px 16px;border-radius:8px;font-size:13px;z-index:60;animation:fadeIn .2s;box-shadow:0 4px 20px rgba(0,0,0,.4)}
+.toast.ok{border-color:var(--correct);color:var(--correct)}
+.toast.no{border-color:var(--wrong);color:var(--wrong)}
+
+/* ===== Streak indicator ===== */
+.streak-float{position:fixed;top:20px;right:20px;background:var(--accent);color:#000;padding:6px 10px;border-radius:999px;font-size:12px;font-weight:700;z-index:40;animation:fadeIn .2s;box-shadow:0 4px 12px rgba(245,158,11,.4)}
+
+@media (max-width:520px){
+  .stats{grid-template-columns:repeat(2,1fr)}
+  .modes{grid-template-columns:1fr}
+  .summary-hero .score{font-size:48px}
+}
+
+footer{text-align:center;color:var(--muted-2);font-size:11px;padding:20px 0 10px;letter-spacing:.05em}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- ========= Home screen ========= -->
+<div id="home-screen" class="screen">
+  <header class="topbar">
+    <h1>🧾 乙級室裝 12600<span class="tag-mo">· Mo</span></h1>
+    <button class="icon-btn" id="btn-import" title="匯入題庫">⬆️</button>
+    <button class="icon-btn" id="btn-export" title="匯出紀錄">⬇️</button>
+    <button class="icon-btn" id="btn-reset" title="重置">⟲</button>
+  </header>
+
+  <div class="stats">
+    <div class="stat"><div class="val" id="stat-bank">0</div><div class="lbl">題庫</div></div>
+    <div class="stat"><div class="val" id="stat-done">0</div><div class="lbl">累計答題</div></div>
+    <div class="stat"><div class="val accent" id="stat-acc">—</div><div class="lbl">正確率</div></div>
+    <div class="stat"><div class="val wrong" id="stat-wrong">0</div><div class="lbl">待複習</div></div>
+  </div>
+
+  <div class="section-title">選擇模式</div>
+  <div class="modes">
+    <button class="mode" data-mode="random">
+      <span class="emo">🎲</span>
+      <span class="ti">隨機練習</span>
+      <span class="ds">從全題庫隨機出 20 題</span>
+    </button>
+    <button class="mode" data-mode="flash">
+      <span class="emo">⚡</span>
+      <span class="ti">速記模式</span>
+      <span class="ds">Flashcard 看題 → 看答案關鍵</span>
+    </button>
+    <button class="mode" data-mode="wrong">
+      <span class="emo">❌</span>
+      <span class="ti">錯題複習</span>
+      <span class="ds" id="wrong-count-label">只練過去答錯的</span>
+      <span class="badge" id="wrong-badge" style="display:none"></span>
+    </button>
+    <button class="mode" data-mode="trap">
+      <span class="emo">🪤</span>
+      <span class="ti">陷阱題</span>
+      <span class="ds">專練有陷阱警示的題</span>
+    </button>
+    <button class="mode" data-mode="mock">
+      <span class="emo">📝</span>
+      <span class="ti">模擬考</span>
+      <span class="ds">80 題 / 60 分 / 60 分及格</span>
+    </button>
+    <button class="mode" data-mode="cat">
+      <span class="emo">📚</span>
+      <span class="ti">分類練習</span>
+      <span class="ds">針對單一類別集中刷</span>
+    </button>
+  </div>
+
+  <div id="cat-panel" class="hidden">
+    <div class="section-title">選擇類別</div>
+    <div class="cats" id="cat-list"></div>
+  </div>
+
+  <div class="section-title">📊 分類表現</div>
+  <div class="cats" id="cat-stats"></div>
+
+  <footer>※ Demo 30 題為考試範圍重點示範，答題前請匯入官方 718 題題庫</footer>
+</div>
+
+<!-- ========= Quiz screen ========= -->
+<div id="quiz-screen" class="screen hidden">
+  <div class="quiz-top">
+    <button class="icon-btn" id="btn-back">←</button>
+    <div class="prog">
+      <div class="counter"><span><span id="q-cur">1</span>/<span id="q-tot">20</span></span><span id="q-streak"></span></div>
+      <div class="bar"><div class="fill" id="q-fill" style="width:0%"></div></div>
+    </div>
+    <div class="timer hidden" id="timer">60:00</div>
+  </div>
+
+  <div class="qcard">
+    <div class="qmeta">
+      <span class="qtag cat" id="q-cat">—</span>
+      <span class="qtag type" id="q-type">—</span>
+      <span class="qtag trap hidden" id="q-trap-tag">⚠️ 陷阱題</span>
+      <span class="qtag" id="q-src">—</span>
+    </div>
+    <div class="qtext" id="q-text">—</div>
+    <div class="opts" id="q-opts"></div>
+    <div id="q-expl"></div>
+  </div>
+
+  <div class="bottom-actions">
+    <button class="btn" id="btn-skip">跳過</button>
+    <button class="btn primary" id="btn-submit">提交答案</button>
+    <button class="btn primary hidden" id="btn-next">下一題 →</button>
+  </div>
+</div>
+
+<!-- ========= Flashcard screen ========= -->
+<div id="flash-screen" class="screen hidden">
+  <div class="quiz-top">
+    <button class="icon-btn" id="btn-back-flash">←</button>
+    <div class="prog">
+      <div class="counter"><span><span id="f-cur">1</span>/<span id="f-tot">30</span></span><span>⚡ 速記</span></div>
+      <div class="bar"><div class="fill" id="f-fill" style="width:0%"></div></div>
+    </div>
+  </div>
+  <div class="flash" id="flash-card">
+    <div class="qmeta">
+      <span class="qtag cat" id="f-cat">—</span>
+    </div>
+    <div class="q" id="f-q">—</div>
+    <div class="ans hidden" id="f-ans">
+      <div class="label">正解</div>
+      <div class="correct-ans" id="f-correct">—</div>
+      <div class="label">答題關鍵</div>
+      <div class="hint-txt" id="f-hint">—</div>
+    </div>
+    <div class="hint-reveal" id="f-prompt">點一下看答案　·　→ 下一張　·　← 上一張</div>
+  </div>
+  <div class="bottom-actions">
+    <button class="btn" id="btn-flash-prev">← 上一張</button>
+    <button class="btn" id="btn-flash-mark">標為不熟</button>
+    <button class="btn primary" id="btn-flash-next">下一張 →</button>
+  </div>
+</div>
+
+<!-- ========= Summary screen ========= -->
+<div id="summary-screen" class="screen hidden">
+  <div class="summary-hero">
+    <div class="score" id="s-score">0</div>
+    <div class="sub">分</div>
+    <div class="verdict" id="s-verdict">—</div>
+  </div>
+  <div class="sum-detail">
+    <div class="row"><span class="lbl">答對</span><span class="val" id="s-right">0</span></div>
+    <div class="row"><span class="lbl">答錯</span><span class="val" id="s-wrong">0</span></div>
+    <div class="row"><span class="lbl">跳過</span><span class="val" id="s-skip">0</span></div>
+    <div class="row"><span class="lbl">正確率</span><span class="val" id="s-acc">—</span></div>
+    <div class="row"><span class="lbl">費時</span><span class="val" id="s-time">—</span></div>
+  </div>
+  <div class="wrong-list hidden" id="s-wrongs"><h3>❌ 本輪錯題</h3><div id="s-wrong-items"></div></div>
+  <div class="bottom-actions">
+    <button class="btn" id="btn-home">回首頁</button>
+    <button class="btn primary" id="btn-retry">再來一輪</button>
+  </div>
+</div>
+
+<!-- ========= Modal ========= -->
+<div id="modal-bg" class="modal-bg hidden"><div class="modal" id="modal"></div></div>
+<div id="toast-host"></div>
+
+</div>
+
+<script>
+/* =====================================================
+   Question Bank · Starter 30 題
+   格式：基於考試範圍 & 公開法規/規範起稿
+   建議：收到官方 718 題後用「匯入」覆蓋
+   ===================================================== */
+const STARTER_BANK = [
+  {
+    "id": "109-q001",
+    "year": 109,
+    "cat": "法規-消防",
+    "type": "single",
+    "q": "依中華民國國家標準CNS 規定，在圖號及圖樣佈置時，Ａ是代表",
+    "o": {
+      "A": "消防設備圖",
+      "B": "建築圖",
+      "C": "結構圖",
+      "D": "空調圖"
+    },
+    "a": [
+      "B"
+    ],
+    "hint": "",
+    "src": "109年學科試題"
+  },
+  {
+    "id": "109-q002",
+    "year": 109,
+    "cat": "施工-泥作",
+    "type": "single",
+    "q": "砌磚前應將磚",
+    "o": {
+      "A": "在烈日下曝曬乾",
+      "B": "隨地亂放",
+      "C": "充分吸收水份",
+      "D": "秤重量"
+    },
+    "a": [
+      "C"
+    ],
+    "hint": "",
+    "src": "109年學科試題"
+  },
+  {
+    "id": "109-q003",
+    "year": 109,
+    "cat": "施工機具",
+    "type": "single",
+    "q": "關於工程日報表的目的，以下哪一項不是要掌握的內容？",
+    "o": {
+      "A": "了解進度執行情形",
+      "B": "了解工具使用情 形",
+      "C": "了解天氣影響工期情形",
+      "D": "了解施工人員情緒"
+    },
+    "a": [
+      "D"
+    ],
+    "hint": "",
+    "src": "109年學科試題"
+  },
+  {
+    "id": "109-q004",
+    "year": 109,
+    "cat": "待分類",
+    "type": "single",
+    "q": "工地環境衛生是指",
+    "o": {
+      "A": "整體作業環境衛生",
+      "B": "飲食衛生",
+      "C": "單作業區衛生",
+      "D": "個人衛生"
+    },
+    "a": [
+      "A"
+    ],
+    "hint": "",
+    "src": "109年學科試題"
+  },
+  {
+    "id": "109-q005",
+    "year": 109,
+    "cat": "法規-職安",
+    "type": "single",
+    "q": "拆除隔間時，關於維護職業安全措施那一項有誤",
+    "o": {
+      "A": "拆除作業區需設標示，禁止非作業人員進入",
+      "B": "應由專任人員於現場指揮監督",
+      "C": "需先規劃好拆除計畫",
+      "D": "作業人員不必戴安全帽"
+    },
+    "a": [
+      "D"
+    ],
+    "hint": "",
+    "src": "109年學科試題"
+  },
+  {
+    "id": "109-q006",
+    "year": 109,
+    "cat": "待分類",
+    "type": "single",
+    "q": "現場丈量玻璃尺寸時下列何者較不重要",
+    "o": {
+      "A": "崁入凹槽之深度及寬度",
+      "B": "安裝位置之日晒及溫溼度變化",
+      "C": "玻璃大小及搬運路徑",
+      "D": "安裝開口處之平直度"
+    },
+    "a": [
+      "B"
+    ],
+    "hint": "",
+    "src": "109年學科試題"
+  },
+  {
+    "id": "109-q007",
+    "year": 109,
+    "cat": "施工-水電",
+    "type": "single",
+    "q": "依中華民國國家標準CNS 規定，在給排水工程之圖說標準中，下圖符號代表飲水用之",
+    "o": {
+      "A": "排水管",
+      "B": "回水管",
+      "C": "飲水管",
+      "D": "給水管"
+    },
+    "a": [
+      "C"
+    ],
+    "hint": "",
+    "src": "109年學科試題"
+  },
+  {
+    "id": "109-q008",
+    "year": 109,
+    "cat": "施工-泥作",
+    "type": "single",
+    "q": "室內裝修施工中較常遭遇感電災害的工作是",
+    "o": {
+      "A": "框架拆除",
+      "B": "電動工具使用",
+      "C": "清理搬運",
+      "D": "貼磁磚"
+    },
+    "a": [
+      "B"
+    ],
+    "hint": "",
+    "src": "109年學科試題"
+  },
+  {
+    "id": "109-q009",
+    "year": 109,
+    "cat": "共同-工倫",
+    "type": "single",
+    "q": "受雇者因承辦業務而知悉營業秘密，在離職後對於該營業秘密的處理方式，下列敘述何者正確？",
+    "o": {
+      "A": "自離職日起3 年後便不再負有保障營業秘密之責",
+      "B": "聘雇關係解除後便不再負有保障營業秘密之 責",
+      "C": "僅能自用而不得販售獲取利益",
+      "D": "離職後仍不得洩漏該營業秘密"
+    },
+    "a": [
+      "D"
+    ],
+    "hint": "",
+    "src": "109年學科試題"
+  },
+  {
+    "id": "109-q010",
+    "year": 109,
+    "cat": "待分類",
+    "type": "single",
+    "q": "彥江是職場上的新鮮人，剛進公司不久，他應該具備怎樣的態度",
+    "o": {
+      "A": "只要做好人脈關係，這樣以後 就好辦事",
+      "B": "上班、下班，管好自己便可",
+      "C": "努力做好自己職掌的業務，樂於工作，與同事之間有良 好的互動，相互協助",
+      "D": "仔細觀察公司生態，加入某些小團體，以做為後盾"
+    },
+    "a": [
+      "C"
+    ],
+    "hint": "",
+    "src": "109年學科試題"
+  },
+  {
+    "id": "109-q011",
+    "year": 109,
+    "cat": "共同-環保",
+    "type": "single",
+    "q": "自行煮水、包裝飲用水及包裝飲料，依生命週期評估排碳量大小順序為下列何者？",
+    "o": {
+      "A": "包裝飲用水 ＞自行煮水＞包裝飲料",
+      "B": "包裝飲料＞包裝飲用水＞自行煮水",
+      "C": "包裝飲料＞自行煮水＞包裝飲用水",
+      "D": "自行煮水＞包裝飲料＞包裝飲用水"
+    },
+    "a": [
+      "B"
+    ],
+    "hint": "",
+    "src": "109年學科試題"
+  },
+  {
+    "id": "109-q012",
+    "year": 109,
+    "cat": "法規-室裝辦法",
+    "type": "single",
+    "q": "依「建築物室內裝修管理辦法」規定，專業技術人員經依該辦法規定廢止登記證，未滿",
+    "o": {
+      "A": "三年",
+      "B": "四年",
+      "C": "一年",
+      "D": "二年 者，不得重新申請登記"
+    },
+    "a": [
+      "A"
+    ],
+    "hint": "",
+    "src": "109年學科試題"
+  },
+  {
+    "id": "109-q013",
+    "year": 109,
+    "cat": "共同-環保",
+    "type": "single",
+    "q": "外食自備餐具是落實綠色消費的哪一項表現？",
+    "o": {
+      "A": "重複使用",
+      "B": "降低成本",
+      "C": "回收再生",
+      "D": "環保選購"
+    },
+    "a": [
+      "A"
+    ],
+    "hint": "",
+    "src": "109年學科試題"
+  },
+  {
+    "id": "109-q014",
+    "year": 109,
+    "cat": "施工-輕隔間",
+    "type": "single",
+    "q": "下列何者不是輕隔間牆施工的正確觀念？",
+    "o": {
+      "A": "施工前提送本輕隔間牆相關材料證明文件給業主",
+      "B": "搬 運材料時要防止碰撞或污損",
+      "C": "板材或骨料能省則省，儘量利用小料拼接，平整及強度不必考慮",
+      "D": "材料儲放應選擇乾燥場地不受日曬雨淋"
+    },
+    "a": [
+      "C"
+    ],
+    "hint": "",
+    "src": "109年學科試題"
+  },
+  {
+    "id": "109-q015",
+    "year": 109,
+    "cat": "共同-職安",
+    "type": "single",
+    "q": "勞工發生死亡職業災害時，雇主應經以下何單位之許可，方得移動或破壞現場？",
+    "o": {
+      "A": "法律輔助機構",
+      "B": "保險公司",
+      "C": "調解委員會",
+      "D": "勞動檢查機構"
+    },
+    "a": [
+      "D"
+    ],
+    "hint": "",
+    "src": "109年學科試題"
+  },
+  {
+    "id": "109-q016",
+    "year": 109,
+    "cat": "待分類",
+    "type": "single",
+    "q": "若發生瓦斯外洩之情形，下列處理方法何者錯誤？",
+    "o": {
+      "A": "在漏氣止住前，應保持警戒，嚴禁煙火",
+      "B": "開 啟電風扇，加強空氣流動",
+      "C": "緩慢地打開門窗，讓瓦斯自然飄散",
+      "D": "應先關閉瓦斯爐或熱水器等開 關"
+    },
+    "a": [
+      "B"
+    ],
+    "hint": "",
+    "src": "109年學科試題"
+  },
+  {
+    "id": "109-q017",
+    "year": 109,
+    "cat": "共同-工倫",
+    "type": "single",
+    "q": "下列關於個人資料保護法的敘述，下列敘述何者錯誤？",
+    "o": {
+      "A": "我的病歷資料雖然是由醫生所撰寫，但 也屬於是我的個人資料範圍",
+      "B": "不管是否使用電腦處理的個人資料，都受個人資料保護法保護",
+      "C": "公 務機關依法執行公權力，不受個人資料保護法規範",
+      "D": "身分證字號、婚姻、指紋都是個人資料"
+    },
+    "a": [
+      "C"
+    ],
+    "hint": "",
+    "src": "109年學科試題"
+  },
+  {
+    "id": "109-q018",
+    "year": 109,
+    "cat": "法規-室裝辦法",
+    "type": "single",
+    "q": "下列何者為建築物室內裝修管理辦法所規範之「室內裝修」行為？",
+    "o": {
+      "A": "牆面油漆",
+      "B": "施作家具",
+      "C": "拆除 室內分間牆",
+      "D": "張貼壁布"
+    },
+    "a": [
+      "C"
+    ],
+    "hint": "",
+    "src": "109年學科試題"
+  },
+  {
+    "id": "109-q019",
+    "year": 109,
+    "cat": "待分類",
+    "type": "single",
+    "q": "下列行為何者「不」屬於敬業精神的表現？",
+    "o": {
+      "A": "遵守時間約定",
+      "B": "保守顧客隱私",
+      "C": "遵守法律規定",
+      "D": "隱 匿公司產品瑕疵訊息"
+    },
+    "a": [
+      "D"
+    ],
+    "hint": "",
+    "src": "109年學科試題"
+  },
+  {
+    "id": "109-q020",
+    "year": 109,
+    "cat": "施工-輕隔間",
+    "type": "single",
+    "q": "輕隔間牆工程於何種狀況下不應進場施工？",
+    "o": {
+      "A": "施工場所無妨礙工程之雜物堆放",
+      "B": "屋頂、外牆及玻 璃均已完成無淋雨之虞",
+      "C": "穿越牆體的管線已完成",
+      "D": "結構體漏水牆壁濕潤"
+    },
+    "a": [
+      "D"
+    ],
+    "hint": "",
+    "src": "109年學科試題"
+  },
+  {
+    "id": "109-q021",
+    "year": 109,
+    "cat": "待分類",
+    "type": "single",
+    "q": "矽力康接著對下列哪一種應力之效應最差？",
+    "o": {
+      "A": "拉力",
+      "B": "扭力",
+      "C": "壓力",
+      "D": "剪力"
+    },
+    "a": [
+      "D"
+    ],
+    "hint": "",
+    "src": "109年學科試題"
+  },
+  {
+    "id": "109-q022",
+    "year": 109,
+    "cat": "法規-室裝辦法",
+    "type": "single",
+    "q": "室內裝修工程施工中，在同一防火區劃空間中，若將原核准設計圖中的2 分石膏板天花板變更為 3 分矽酸鈣板天花板(惟不降低原使用裝修材料耐燃等級)，應如何處理",
+    "o": {
+      "A": "不必處理，直接申請竣 工查驗",
+      "B": "一定要先完成變更設計程序，方可繼續施工",
+      "C": "竣工後，修改竣工圖連同資料送審即可",
+      "D": "一定要拆除，再依原設計圖說施作"
+    },
+    "a": [
+      "C"
+    ],
+    "hint": "",
+    "src": "109年學科試題"
+  },
+  {
+    "id": "109-q023",
+    "year": 109,
+    "cat": "共同-職安",
+    "type": "single",
+    "q": "下列關於膠合玻璃的敘述那一項是錯誤？",
+    "o": {
+      "A": "中間膜的選擇多，使玻璃具有美感",
+      "B": "具有隔音效果",
+      "C": "利用高溫高壓在中間夾PVB 樹脂膜而成",
+      "D": "安全性高但不具節能效率"
+    },
+    "a": [
+      "D"
+    ],
+    "hint": "",
+    "src": "109年學科試題"
+  },
+  {
+    "id": "109-q024",
+    "year": 109,
+    "cat": "施工-金屬",
+    "type": "single",
+    "q": "金屬加工在塗裝面漆之前，常用下列何種底漆塗裝以防生鏽",
+    "o": {
+      "A": "紅丹漆",
+      "B": "二度底漆",
+      "C": "調和漆",
+      "D": "紅色 染料"
+    },
+    "a": [
+      "A"
+    ],
+    "hint": "",
+    "src": "109年學科試題"
+  },
+  {
+    "id": "109-q025",
+    "year": 109,
+    "cat": "圖說判讀",
+    "type": "single",
+    "q": "依中華民國國家標準CNS 規定，在圖樣圖示準則中 左圖符號是",
+    "o": {
+      "A": "截斷線",
+      "B": "指示線",
+      "C": "剖 面線",
+      "D": "地界線"
+    },
+    "a": [
+      "A"
+    ],
+    "hint": "",
+    "src": "109年學科試題"
+  },
+  {
+    "id": "109-q026",
+    "year": 109,
+    "cat": "施工-木作",
+    "type": "single",
+    "q": "下列何種不是壁紙常用之施工工具？",
+    "o": {
+      "A": "美工刀",
+      "B": "塗糊機",
+      "C": "長毛刷",
+      "D": "砂輪機"
+    },
+    "a": [
+      "D"
+    ],
+    "hint": "",
+    "src": "109年學科試題"
+  },
+  {
+    "id": "109-q027",
+    "year": 109,
+    "cat": "共同-節能",
+    "type": "single",
+    "q": "下列何者非屬勞工從事電氣工作，應符合之規定？",
+    "o": {
+      "A": "停電作業應檢電掛接地",
+      "B": "穿戴絕緣防護具",
+      "C": "穿戴棉質手套絕緣",
+      "D": "使其使用電工安全帽"
+    },
+    "a": [
+      "C"
+    ],
+    "hint": "",
+    "src": "109年學科試題"
+  },
+  {
+    "id": "109-q028",
+    "year": 109,
+    "cat": "待分類",
+    "type": "single",
+    "q": "強化玻璃之強度約為一般玻璃之",
+    "o": {
+      "A": "1.5～2 倍",
+      "B": "2～3 倍",
+      "C": "3～5 倍",
+      "D": "5～10 倍"
+    },
+    "a": [
+      "C"
+    ],
+    "hint": "",
+    "src": "109年學科試題"
+  },
+  {
+    "id": "109-q029",
+    "year": 109,
+    "cat": "法規-室裝辦法",
+    "type": "single",
+    "q": "依「建築物室內裝修管理辦法」規定，專業技術人員十年內受停止執行職務處分累計滿二年者， 當地主管建築機關應查明屬實後，報請內政部",
+    "o": {
+      "A": "廢止登記許可並註銷登記證",
+      "B": "處新台幣6 萬元以 上罰鍰",
+      "C": "處新台幣30 萬元以下罰鍰",
+      "D": "予以警告"
+    },
+    "a": [
+      "A"
+    ],
+    "hint": "",
+    "src": "109年學科試題"
+  },
+  {
+    "id": "109-q030",
+    "year": 109,
+    "cat": "共同-環保",
+    "type": "single",
+    "q": "2015 年巴黎協議之目的為何？",
+    "o": {
+      "A": "生物多樣性保育",
+      "B": "避免臭氧層破壞",
+      "C": "減少持久性污染物排放",
+      "D": "遏 阻全球暖化趨勢"
+    },
+    "a": [
+      "D"
+    ],
+    "hint": "",
+    "src": "109年學科試題"
+  },
+  {
+    "id": "109-q031",
+    "year": 109,
+    "cat": "圖說判讀",
+    "type": "single",
+    "q": "申請室內裝修審核圖說時之裝修詳細圖之比例尺不得小於",
+    "o": {
+      "A": "一百分之一",
+      "B": "五十分之一",
+      "C": "三十分之 一",
+      "D": "二百分之一"
+    },
+    "a": [
+      "C"
+    ],
+    "hint": "",
+    "src": "109年學科試題"
+  },
+  {
+    "id": "109-q032",
+    "year": 109,
+    "cat": "共同-環保",
+    "type": "single",
+    "q": "下列何種方式沒有辦法降低洗衣機之使用水量，所以不建議採用？",
+    "o": {
+      "A": "選擇快洗行程",
+      "B": "使用低水位 清洗",
+      "C": "兩、三件衣服也丟洗衣機洗",
+      "D": "選擇有自動調節水量的洗衣機，洗衣清洗前先脫水1 次"
+    },
+    "a": [
+      "C"
+    ],
+    "hint": "",
+    "src": "109年學科試題"
+  },
+  {
+    "id": "109-q033",
+    "year": 109,
+    "cat": "待分類",
+    "type": "single",
+    "q": "事業單位之勞工代表如何產生？",
+    "o": {
+      "A": "由產業工會推派之",
+      "B": "由勞資雙方協議推派之",
+      "C": "由企業工會推派 之",
+      "D": "由勞工輪流擔任之"
+    },
+    "a": [
+      "C"
+    ],
+    "hint": "",
+    "src": "109年學科試題"
+  },
+  {
+    "id": "109-q034",
+    "year": 109,
+    "cat": "法規-建技規",
+    "type": "single",
+    "q": "依「建築法」規定，室內裝修從業者應經",
+    "o": {
+      "A": "法務部",
+      "B": "勞動部",
+      "C": "行政院公共工程委員會",
+      "D": "內政部 登記許可，並依其業務範圍及責任執行業務"
+    },
+    "a": [
+      "D"
+    ],
+    "hint": "",
+    "src": "109年學科試題"
+  },
+  {
+    "id": "109-q035",
+    "year": 109,
+    "cat": "共同-環保",
+    "type": "single",
+    "q": "小明拿到「垃圾強制分類」的宣導海報，標語寫著「分3 類，好OK」，標語中的分3 類是指家 戶日常生活中產生的垃圾可以區分哪三類？",
+    "o": {
+      "A": "資源、廚餘、事業廢棄物",
+      "B": "資源、一般廢棄物、事 業廢棄物",
+      "C": "資源、廚餘、一般垃圾",
+      "D": "一般廢棄物、事業廢棄物、放射性廢棄物"
+    },
+    "a": [
+      "C"
+    ],
+    "hint": "",
+    "src": "109年學科試題"
+  },
+  {
+    "id": "109-q036",
+    "year": 109,
+    "cat": "圖說判讀",
+    "type": "single",
+    "q": "在比例尺1/50 的圖面上，施工人員以捲尺量得長度為10 公分的牆面，實際代表長度為",
+    "o": {
+      "A": "20 公尺",
+      "B": "15 公尺",
+      "C": "5 公尺",
+      "D": "10 公尺"
+    },
+    "a": [
+      "C"
+    ],
+    "hint": "",
+    "src": "109年學科試題"
+  },
+  {
+    "id": "109-q037",
+    "year": 109,
+    "cat": "管理-驗收",
+    "type": "single",
+    "q": "有關台灣能源發展所面臨的挑戰，下列何者為非？",
+    "o": {
+      "A": "化石能源所占比例高，溫室氣體減量壓力大",
+      "B": "自產能源充足，不需仰賴進口",
+      "C": "能源密集度較先進國家仍有改善空間",
+      "D": "進口能源依存度高，能 源安全易受國際影響"
+    },
+    "a": [
+      "B"
+    ],
+    "hint": "",
+    "src": "109年學科試題"
+  },
+  {
+    "id": "109-q038",
+    "year": 109,
+    "cat": "待分類",
+    "type": "single",
+    "q": "下列敘述何者為不正確？",
+    "o": {
+      "A": "工地吊掛料件應估計重量",
+      "B": "吊起時應注意工件是否滑脫",
+      "C": "吊起料件之 重心應在吊鉤正下方",
+      "D": "吊掛作業範圍內容許工作人員自由進出"
+    },
+    "a": [
+      "D"
+    ],
+    "hint": "",
+    "src": "109年學科試題"
+  },
+  {
+    "id": "109-q039",
+    "year": 109,
+    "cat": "施工-輕隔間",
+    "type": "single",
+    "q": "輕隔間牆使用接縫貼紙，主要目的在",
+    "o": {
+      "A": "防止濕氣",
+      "B": "修飾接縫",
+      "C": "增加牆板柔軟度",
+      "D": "加強牆板結構"
+    },
+    "a": [
+      "B"
+    ],
+    "hint": "",
+    "src": "109年學科試題"
+  },
+  {
+    "id": "109-q040",
+    "year": 109,
+    "cat": "待分類",
+    "type": "single",
+    "q": "勞工於室內工作場所主要人行道寬度至少應有多少公分？",
+    "o": {
+      "A": "60",
+      "B": "80",
+      "C": "120",
+      "D": "100"
+    },
+    "a": [
+      "D"
+    ],
+    "hint": "",
+    "src": "109年學科試題"
+  },
+  {
+    "id": "109-q041",
+    "year": 109,
+    "cat": "共同-節能",
+    "type": "single",
+    "q": "於營造工地潮濕場所中使用電動機具，為防止感電危害，應於該電路設置何種安全裝置？",
+    "o": {
+      "A": "閉關 箱",
+      "B": "高感度高速型漏電斷路器",
+      "C": "高容量保險絲",
+      "D": "自動電擊防止裝置"
+    },
+    "a": [
+      "B"
+    ],
+    "hint": "",
+    "src": "109年學科試題"
+  },
+  {
+    "id": "109-q042",
+    "year": 109,
+    "cat": "法規-建技規",
+    "type": "single",
+    "q": "依「建築技術規則」規定，經中央建築機關認定，符合耐燃一級之不因火熱引起燃燒、熔化、破 裂變形及產生有害氣體之材料，可視為",
+    "o": {
+      "A": "耐燃材料",
+      "B": "耐火板",
+      "C": "不燃材料",
+      "D": "防火材料"
+    },
+    "a": [
+      "C"
+    ],
+    "hint": "",
+    "src": "109年學科試題"
+  },
+  {
+    "id": "109-q043",
+    "year": 109,
+    "cat": "待分類",
+    "type": "single",
+    "q": "使用透明PVC 膠管測水平時，下列何者對其測定結果沒有影響？",
+    "o": {
+      "A": "管內水位未靜止",
+      "B": "管內有氣泡",
+      "C": "管內盛水量多寡",
+      "D": "管內堵塞"
+    },
+    "a": [
+      "C"
+    ],
+    "hint": "",
+    "src": "109年學科試題"
+  },
+  {
+    "id": "109-q044",
+    "year": 109,
+    "cat": "施工-泥作",
+    "type": "single",
+    "q": "既有鋼筋混凝土牆面在法規及結構容許情況下，要打開一片採光窗，為避免造成破壞面積過大及 日後造成漏水現象宜採用",
+    "o": {
+      "A": "混凝土切割機切割",
+      "B": "電動打石機打除",
+      "C": "大鐵鎚敲打破碎",
+      "D": "混凝土鑽孔 機連續鑽孔"
+    },
+    "a": [
+      "A"
+    ],
+    "hint": "",
+    "src": "109年學科試題"
+  },
+  {
+    "id": "109-q045",
+    "year": 109,
+    "cat": "共同-節能",
+    "type": "single",
+    "q": "在潮濕工作場所使用電動工具時，應優先考量防止下列何種災害發生？",
+    "o": {
+      "A": "感電",
+      "B": "刺痛",
+      "C": "扭傷",
+      "D": "撞 擊"
+    },
+    "a": [
+      "A"
+    ],
+    "hint": "",
+    "src": "109年學科試題"
+  },
+  {
+    "id": "109-q046",
+    "year": 109,
+    "cat": "管理-估算",
+    "type": "single",
+    "q": "一抽屜長2.5 尺寬1.8 尺高5 寸使用4 分厚樟木抽屜牆板四面施工共計需多少才積？(不考慮損耗 範圍)",
+    "o": {
+      "A": "1.8 才",
+      "B": "0.9 才",
+      "C": "1.72 才",
+      "D": "3.44 才"
+    },
+    "a": [
+      "C"
+    ],
+    "hint": "",
+    "src": "109年學科試題"
+  },
+  {
+    "id": "109-q047",
+    "year": 109,
+    "cat": "圖說判讀",
+    "type": "single",
+    "q": "施工圖上之比例尺為1/50，表示圖形是？",
+    "o": {
+      "A": "縮小比例尺寸",
+      "B": "任意比例尺寸",
+      "C": "實際比例尺寸",
+      "D": "放大 比例尺寸"
+    },
+    "a": [
+      "A"
+    ],
+    "hint": "",
+    "src": "109年學科試題"
+  },
+  {
+    "id": "109-q048",
+    "year": 109,
+    "cat": "施工-水電",
+    "type": "single",
+    "q": "電氣機具施行接地之目的是",
+    "o": {
+      "A": "測定電流",
+      "B": "防止漏電損失",
+      "C": "電壓穩定",
+      "D": "防止感電事故"
+    },
+    "a": [
+      "D"
+    ],
+    "hint": "",
+    "src": "109年學科試題"
+  },
+  {
+    "id": "109-q049",
+    "year": 109,
+    "cat": "施工-木作",
+    "type": "single",
+    "q": "壁紙一捲一般核計面積坪數為",
+    "o": {
+      "A": "1 坪",
+      "B": "1.5 坪",
+      "C": "2 坪",
+      "D": "1.2 坪"
+    },
+    "a": [
+      "B"
+    ],
+    "hint": "",
+    "src": "109年學科試題"
+  },
+  {
+    "id": "109-q050",
+    "year": 109,
+    "cat": "待分類",
+    "type": "single",
+    "q": "水性塗料的特點不包括下列哪項？",
+    "o": {
+      "A": "防水性能佳",
+      "B": "以水為稀釋劑",
+      "C": "溶劑較不具毒性",
+      "D": "較不易引起 火災"
+    },
+    "a": [
+      "A"
+    ],
+    "hint": "",
+    "src": "109年學科試題"
+  },
+  {
+    "id": "109-q051",
+    "year": 109,
+    "cat": "施工-泥作",
+    "type": "single",
+    "q": "混凝土的主要功能是",
+    "o": {
+      "A": "抗張力",
+      "B": "抗壓力",
+      "C": "抗彎力",
+      "D": "抗剪力"
+    },
+    "a": [
+      "B"
+    ],
+    "hint": "",
+    "src": "109年學科試題"
+  },
+  {
+    "id": "109-q052",
+    "year": 109,
+    "cat": "丈量放樣",
+    "type": "single",
+    "q": "檢查三角形是否為直角，常用三邊的比為",
+    "o": {
+      "A": "4：5：6",
+      "B": "3：4：5",
+      "C": "2：3：4",
+      "D": "1：2：3"
+    },
+    "a": [
+      "B"
+    ],
+    "hint": "",
+    "src": "109年學科試題"
+  },
+  {
+    "id": "109-q053",
+    "year": 109,
+    "cat": "施工-輕隔間",
+    "type": "single",
+    "q": "輕隔間牆使用石膏板材料封板時，每根立柱皆應鎖螺釘，且為確保板材之確實鎖定於骨架，螺釘 間距應為",
+    "o": {
+      "A": "30",
+      "B": "120",
+      "C": "60",
+      "D": "90 公分合宜"
+    },
+    "a": [
+      "A"
+    ],
+    "hint": "",
+    "src": "109年學科試題"
+  },
+  {
+    "id": "109-q054",
+    "year": 109,
+    "cat": "施工-泥作",
+    "type": "single",
+    "q": "新作牆面油漆粉刷打底",
+    "o": {
+      "A": "依實際情況，可打底可不打底",
+      "B": "用專用底漆",
+      "C": "可用舊漆混合作底漆",
+      "D": "根 本不用打底"
+    },
+    "a": [
+      "B"
+    ],
+    "hint": "",
+    "src": "109年學科試題"
+  },
+  {
+    "id": "109-q055",
+    "year": 109,
+    "cat": "圖說判讀",
+    "type": "single",
+    "q": "建築物非屬室內裝修申請人所有，其申請室內裝修審核圖說時應檢附",
+    "o": {
+      "A": "土地使用權同意書",
+      "B": "租賃 使用權同意書",
+      "C": "建築物使用權同意書",
+      "D": "室內使用權同意書"
+    },
+    "a": [
+      "C"
+    ],
+    "hint": "",
+    "src": "109年學科試題"
+  },
+  {
+    "id": "109-q056",
+    "year": 109,
+    "cat": "待分類",
+    "type": "single",
+    "q": "施作實木封邊上膠時，下列那一項是錯誤的方法？",
+    "o": {
+      "A": "貼合時，實木條應來回移動一下使膠均勻分 佈",
+      "B": "膠愈厚愈理想",
+      "C": "接合面皆擦適量之膠",
+      "D": "溢出之殘膠用濕布擦拭乾淨"
+    },
+    "a": [
+      "B"
+    ],
+    "hint": "",
+    "src": "109年學科試題"
+  },
+  {
+    "id": "109-q057",
+    "year": 109,
+    "cat": "管理-進度",
+    "type": "single",
+    "q": "CPM 網狀式圖表最適用於",
+    "o": {
+      "A": "小規模工程管理",
+      "B": "複雜度高的工程管理",
+      "C": "大規模工程管理",
+      "D": "部分工程 管理"
+    },
+    "a": [
+      "B"
+    ],
+    "hint": "",
+    "src": "109年學科試題"
+  },
+  {
+    "id": "109-q058",
+    "year": 109,
+    "cat": "法規-消防",
+    "type": "single",
+    "q": "下列何者不屬於弱電設備",
+    "o": {
+      "A": "播音、廣播系統",
+      "B": "火警警報器",
+      "C": "電話系統",
+      "D": "緊急照明系統"
+    },
+    "a": [
+      "D"
+    ],
+    "hint": "",
+    "src": "109年學科試題"
+  },
+  {
+    "id": "109-q059",
+    "year": 109,
+    "cat": "施工-金屬",
+    "type": "single",
+    "q": "下列何者不是金屬工作表面處理的目的",
+    "o": {
+      "A": "耐衝擊",
+      "B": "改變色澤",
+      "C": "防鏽蝕",
+      "D": "增加美觀"
+    },
+    "a": [
+      "A"
+    ],
+    "hint": "",
+    "src": "109年學科試題"
+  },
+  {
+    "id": "109-q060",
+    "year": 109,
+    "cat": "待分類",
+    "type": "single",
+    "q": "下列何者為非再生能源？",
+    "o": {
+      "A": "焦煤",
+      "B": "地熱能",
+      "C": "水力能",
+      "D": "太陽能"
+    },
+    "a": [
+      "A"
+    ],
+    "hint": "",
+    "src": "109年學科試題"
+  },
+  {
+    "id": "109-q061",
+    "year": 109,
+    "cat": "待分類",
+    "type": "multi",
+    "q": "依機械設備器具安全標準規定，圓盤鋸應於明顯易見處標示哪些？",
+    "o": {
+      "A": "鋸齒接觸預防裝置，標示適 用之圓鋸片之內徑範圍及用途",
+      "B": "額定電壓",
+      "C": "額定功率或額定電流",
+      "D": "適用之圓鋸片之內徑範圍"
+    },
+    "a": [
+      "B",
+      "C"
+    ],
+    "hint": "",
+    "src": "109年學科試題"
+  },
+  {
+    "id": "109-q062",
+    "year": 109,
+    "cat": "管理-估算",
+    "type": "multi",
+    "q": "營造用各類物材之儲存、堆積及排列，不得儲存於距",
+    "o": {
+      "A": "廁所",
+      "B": "升降機",
+      "C": "庫門",
+      "D": "窗樘 等二公尺範 圍以內"
+    },
+    "a": [
+      "B",
+      "C"
+    ],
+    "hint": "",
+    "src": "109年學科試題"
+  },
+  {
+    "id": "109-q063",
+    "year": 109,
+    "cat": "共同-職安",
+    "type": "multi",
+    "q": "依營造安全衛生設施標準規定，施工中對於袋裝材料之儲存，為保持其穩定，下列哪些為正確？",
+    "o": {
+      "A": "至少每3 層交錯一次方向",
+      "B": "堆放高度不得超過10 層",
+      "C": "6 層以上部分應向內退縮，以維持穩定",
+      "D": "交錯方向易引起材料變質者，得以不影響穩定之方式堆放"
+    },
+    "a": [
+      "B",
+      "D"
+    ],
+    "hint": "",
+    "src": "109年學科試題"
+  },
+  {
+    "id": "109-q064",
+    "year": 109,
+    "cat": "待分類",
+    "type": "multi",
+    "q": "夾層玻璃之敘述，下列哪些為不正確？",
+    "o": {
+      "A": "經加熱、加壓、黏合而成",
+      "B": "由單片平板玻璃兩側嵌夾透 明塑料薄襯片製成",
+      "C": "夾層玻璃也屬安全玻璃",
+      "D": "可製成平面不能製成曲面的複合玻璃製品"
+    },
+    "a": [
+      "B",
+      "D"
+    ],
+    "hint": "",
+    "src": "109年學科試題"
+  },
+  {
+    "id": "109-q065",
+    "year": 109,
+    "cat": "法規-消防",
+    "type": "multi",
+    "q": "下列哪些敘述正確？",
+    "o": {
+      "A": "室內裝修施工從業者應依照核定之室內裝修圖說施工；如於施工前或施工 中變更設計時，仍應依本辦法申請辦理審核",
+      "B": "室內裝修圖說經審核合格，領得許可文件後，因故 未能於規定期限內完工時，其許可文件不能展延立即失其效力",
+      "C": "室內裝修申請審核之圖說涉及消 防安全設備變更者，應依消防法規規定辦理，並應於施工後取得當地消防主管機關審核合格之文 件",
+      "D": "室內裝修圖說經審核合格，領得許可文件後，因故未能於規定期限內完工時，得申請展期"
+    },
+    "a": [
+      "A",
+      "D"
+    ],
+    "hint": "",
+    "src": "109年學科試題"
+  },
+  {
+    "id": "109-q066",
+    "year": 109,
+    "cat": "管理-估算",
+    "type": "multi",
+    "q": "有關室內裝修一般常見的魯班尺上半部為文公尺，下列哪些為用於陽宅、神位、佛具尺寸之吉凶 的度量衡之文字？",
+    "o": {
+      "A": "苦",
+      "B": "財",
+      "C": "本",
+      "D": "離"
+    },
+    "a": [
+      "B",
+      "C",
+      "D"
+    ],
+    "hint": "",
+    "src": "109年學科試題"
+  },
+  {
+    "id": "109-q067",
+    "year": 109,
+    "cat": "共同-節能",
+    "type": "multi",
+    "q": "依用戶用電設備裝置規則，電燈、電具及插座分路，對地電壓不得超過一五○伏，惟符合規定者 對地電壓得超過一五○伏，但不得超過三○○伏，哪些是正確？",
+    "o": {
+      "A": "燈具上未裝操作開關",
+      "B": "放電燈 具之安定器，應永久固定於燈具內或適當處所",
+      "C": "電具及插座分路加裝漏電斷路器或採用一種有極 性之接地型插頭及插座",
+      "D": "燈具裝置距離地面不小於1.8 公尺"
+    },
+    "a": [
+      "A",
+      "B",
+      "C"
+    ],
+    "hint": "",
+    "src": "109年學科試題"
+  },
+  {
+    "id": "109-q068",
+    "year": 109,
+    "cat": "法規-消防",
+    "type": "multi",
+    "q": "依中華民國國家標準CNS11567 之A1042 建築設備圖表示法規定，下列設備符號表示何者不正 確？",
+    "o": {
+      "A": "表示避難方向指標",
+      "B": "表示水霧自動灑水頭",
+      "C": "表示接地型單地板插座",
+      "D": "表 示接地型專用單插座"
+    },
+    "a": [
+      "B",
+      "C"
+    ],
+    "hint": "",
+    "src": "109年學科試題"
+  },
+  {
+    "id": "109-q069",
+    "year": 109,
+    "cat": "施工-泥作",
+    "type": "multi",
+    "q": "下列圖例表示哪些為正確？",
+    "o": {
+      "A": "表示輕質牆",
+      "B": "表示石材",
+      "C": "表示 鋼筋混凝土",
+      "D": "表示網"
+    },
+    "a": [
+      "B",
+      "C",
+      "D"
+    ],
+    "hint": "",
+    "src": "109年學科試題"
+  },
+  {
+    "id": "109-q070",
+    "year": 109,
+    "cat": "施工-金屬",
+    "type": "multi",
+    "q": "下列圓盤鋸說明哪些是正確？",
+    "o": {
+      "A": "手持式圓盤鋸：以電動馬達或磁力驅動用來進行鋸切加工作業的 機械設備",
+      "B": "撐縫片：與鋸片同平面的金屬零件，當鋸片鋸切後防止加工件密合而夾住鋸片，造成 圓盤鋸卡住或鋸片破裂",
+      "C": "移動式護罩：通常設置在導板平面的下方，防止人員接觸固定式護罩無 法保護到的鋸片部份",
+      "D": "固定式護罩：以臨時固定的方式連結在馬達上的護罩，以防止人員接觸導 板平面上方的鋸片"
+    },
+    "a": [
+      "A",
+      "B",
+      "C"
+    ],
+    "hint": "",
+    "src": "109年學科試題"
+  },
+  {
+    "id": "109-q071",
+    "year": 109,
+    "cat": "待分類",
+    "type": "multi",
+    "q": "水泥之運送、儲存及處理，下列敘述哪些正確？",
+    "o": {
+      "A": "原則上水泥應以散裝運至預拌廠之水泥槽斗儲 存",
+      "B": "已結塊或工程司認為已變質之水泥，不得使用於本工程，並應立即整批運離工地",
+      "C": "散裝水泥 應儲存在乾燥防水之槽斗內，袋裝水泥應儲存在乾燥防水之庫房或經工程司同意之建築物內",
+      "D": "袋 裝水泥儲存應置於高出地面至少5CM 之地板上，水泥堆放高度不得超過13 袋"
+    },
+    "a": [
+      "A",
+      "B",
+      "C"
+    ],
+    "hint": "",
+    "src": "109年學科試題"
+  },
+  {
+    "id": "109-q072",
+    "year": 109,
+    "cat": "圖說判讀",
+    "type": "multi",
+    "q": "室內裝修從業者有下列哪些情事之一者，當地主管建築機關應查明屬實後，報請內政部視其情節 輕重，予以警告、六個月以上一年以下停止室內裝修業務處分或一年以上三年以下停止換發登記 證處分？",
+    "o": {
+      "A": "規避、妨礙或拒絕主管機關業務督導",
+      "B": "施工材料與規定不符或未依圖說施工，經當地 主管建築機關通知限期修改逾期未修改",
+      "C": "未依規定繳交營業稅",
+      "D": "受委託設計之圖樣、說明書、竣 工查驗合格簽章之檢查表或其他書件經抽查結果與相關法令規定不符"
+    },
+    "a": [
+      "A",
+      "B",
+      "D"
+    ],
+    "hint": "",
+    "src": "109年學科試題"
+  },
+  {
+    "id": "109-q073",
+    "year": 109,
+    "cat": "待分類",
+    "type": "multi",
+    "q": "玻璃安裝用黏劑成份之彈性材料，凝結後應具有下列何特性？",
+    "o": {
+      "A": "伸展性",
+      "B": "防剝落力",
+      "C": "抗壓性",
+      "D": "復 原性"
+    },
+    "a": [
+      "A",
+      "B",
+      "D"
+    ],
+    "hint": "",
+    "src": "109年學科試題"
+  },
+  {
+    "id": "109-q074",
+    "year": 109,
+    "cat": "待分類",
+    "type": "multi",
+    "q": "面磚之優點有下列哪些？",
+    "o": {
+      "A": "成品之色彩，容易變色",
+      "B": "耐候力強，不老化，耐水，耐火，耐磨及耐 高壓",
+      "C": "穩定性高不變形，不褪色及伸縮率低",
+      "D": "硬度高耐蝕，耐酸及耐鹽"
+    },
+    "a": [
+      "B",
+      "C",
+      "D"
+    ],
+    "hint": "",
+    "src": "109年學科試題"
+  },
+  {
+    "id": "109-q075",
+    "year": 109,
+    "cat": "施工-泥作",
+    "type": "multi",
+    "q": "混凝土是由下列哪些材料構成？",
+    "o": {
+      "A": "砂",
+      "B": "碎磚拌合成強而耐用的建材",
+      "C": "碎石",
+      "D": "波特蘭水泥"
+    },
+    "a": [
+      "A",
+      "C",
+      "D"
+    ],
+    "hint": "",
+    "src": "109年學科試題"
+  },
+  {
+    "id": "109-q076",
+    "year": 109,
+    "cat": "待分類",
+    "type": "multi",
+    "q": "地面樓層達十一層以上建築物室內裝修，下列哪些材料應使用附有防焰標示？",
+    "o": {
+      "A": "窗簾",
+      "B": "地毯",
+      "C": "桌 布",
+      "D": "布幕"
+    },
+    "a": [
+      "A",
+      "B",
+      "D"
+    ],
+    "hint": "",
+    "src": "109年學科試題"
+  },
+  {
+    "id": "109-q077",
+    "year": 109,
+    "cat": "丈量放樣",
+    "type": "multi",
+    "q": "下列哪些為室內裝修垂直放樣工具？",
+    "o": {
+      "A": "平板儀",
+      "B": "透明水管",
+      "C": "錘球",
+      "D": "經緯儀"
+    },
+    "a": [
+      "C",
+      "D"
+    ],
+    "hint": "",
+    "src": "109年學科試題"
+  },
+  {
+    "id": "109-q078",
+    "year": 109,
+    "cat": "施工-塗裝",
+    "type": "multi",
+    "q": "有關裝修塗裝作業，下列敘述何者正確？",
+    "o": {
+      "A": "塗裝說明書係對塗裝施工內容、質量作較詳細規範 者，亦即明示在施工上所要遵守的各種條件及最終修飾程度",
+      "B": "各塗裝工程，不須預先施行被塗物 表面處理",
+      "C": "塗裝工程之計畫明細表如塗裝工程表及塗裝說明書，有利塗裝施工順利進行，並可作 為塗裝施工完成時之驗收依據，預防可能之驗收糾紛",
+      "D": "塗裝工程表係簡單明瞭表示塗裝施工程 序，惟對最終修飾程度不詳列"
+    },
+    "a": [
+      "A",
+      "C",
+      "D"
+    ],
+    "hint": "",
+    "src": "109年學科試題"
+  },
+  {
+    "id": "109-q079",
+    "year": 109,
+    "cat": "待分類",
+    "type": "multi",
+    "q": "依施工規範規定，兩塊地毯之接縫接合時，哪些是正確",
+    "o": {
+      "A": "接合部位應設於門口部位，以及光線易 照射之位置",
+      "B": "有圖案之地毯接合處應完全密合",
+      "C": "地毯正面之箭頭應同向裁剪及鋪設接合",
+      "D": "避免色 差"
+    },
+    "a": [
+      "B",
+      "D"
+    ],
+    "hint": "",
+    "src": "109年學科試題"
+  },
+  {
+    "id": "109-q080",
+    "year": 109,
+    "cat": "施工-木作",
+    "type": "multi",
+    "q": "有關木材材積計算(不考慮損耗)，下列計算結果何者錯誤？",
+    "o": {
+      "A": "1 台寸×1 台尺×1 台尺＝1 才",
+      "B": "1 台 寸×1 台尺×10 台尺＝1 才",
+      "C": "1 台寸×1 台寸×10 台尺＝1 才",
+      "D": "1 台尺×1 台尺×10 台尺＝1 才"
+    },
+    "a": [
+      "B",
+      "D"
+    ],
+    "hint": "",
+    "src": "109年學科試題"
+  },
+  {
+    "id": "110-q001",
+    "year": 110,
+    "cat": "共同-節能",
+    "type": "single",
+    "q": "輕鋼架明架礦纖板天花板施工，遇到邊緣不足一塊礦纖板寬度時，要將板材切割時宜用",
+    "o": {
+      "A": "電鑽",
+      "B": "美工刀",
+      "C": "鐵板剪",
+      "D": "鏝刀 裁切"
+    },
+    "a": [
+      "B"
+    ],
+    "hint": "",
+    "src": "110年學科試題"
+  },
+  {
+    "id": "110-q002",
+    "year": 110,
+    "cat": "共同-節能",
+    "type": "single",
+    "q": "為了節能與降低電費的需求，家電產品的正確選用應該如何？",
+    "o": {
+      "A": "設備沒有壞，還是堪用，繼續 用，不會增加支出",
+      "B": "選用能效分級數字較高的產品，效率較高，5 級的比1 級的電器產品更省電",
+      "C": "優先選用取得節能標章的產品",
+      "D": "選用高功率的產品效率較高"
+    },
+    "a": [
+      "C"
+    ],
+    "hint": "",
+    "src": "110年學科試題"
+  },
+  {
+    "id": "110-q003",
+    "year": 110,
+    "cat": "共同-節能",
+    "type": "single",
+    "q": "用電設備的線路保護用電力熔絲(保險絲)經常燒斷，造成停電的不便，下列何者不是正確的作 法？",
+    "o": {
+      "A": "減少線路連接的電氣設備，降低用電量",
+      "B": "提高用電設備的功率因數",
+      "C": "重新設計線路，改較 粗的導線或用兩迴路並聯",
+      "D": "換大一級或大兩級規格的保險絲或斷路器就不會燒斷了"
+    },
+    "a": [
+      "D"
+    ],
+    "hint": "",
+    "src": "110年學科試題"
+  },
+  {
+    "id": "110-q004",
+    "year": 110,
+    "cat": "施工-泥作",
+    "type": "single",
+    "q": "砌磚工作程序下列敘述何者正確？",
+    "o": {
+      "A": "摔漿→刮漿→撥漿→砌頭",
+      "B": "摔漿→撥漿→刮漿→砌頭",
+      "C": "撥漿 →摔漿→刮漿→砌頭",
+      "D": "刮漿→砌頭→摔漿→撥漿"
+    },
+    "a": [
+      "B"
+    ],
+    "hint": "",
+    "src": "110年學科試題"
+  },
+  {
+    "id": "110-q005",
+    "year": 110,
+    "cat": "施工-水電",
+    "type": "single",
+    "q": "下列何種顏色可作為接地線使用？",
+    "o": {
+      "A": "紅色",
+      "B": "綠色",
+      "C": "黑色",
+      "D": "白色"
+    },
+    "a": [
+      "B"
+    ],
+    "hint": "",
+    "src": "110年學科試題"
+  },
+  {
+    "id": "110-q006",
+    "year": 110,
+    "cat": "施工-木作",
+    "type": "single",
+    "q": "一般壁紙於施作時，如漿糊濃度過高，可添加何種物質稀釋，方便施工？",
+    "o": {
+      "A": "松香水",
+      "B": "水",
+      "C": "香蕉水",
+      "D": "甲苯"
+    },
+    "a": [
+      "B"
+    ],
+    "hint": "",
+    "src": "110年學科試題"
+  },
+  {
+    "id": "110-q007",
+    "year": 110,
+    "cat": "法規-室裝辦法",
+    "type": "single",
+    "q": "所謂室內裝修從業者，不包括下列何者",
+    "o": {
+      "A": "營造業",
+      "B": "開業建築師",
+      "C": "室內裝修業",
+      "D": "室內裝潢業"
+    },
+    "a": [
+      "D"
+    ],
+    "hint": "",
+    "src": "110年學科試題"
+  },
+  {
+    "id": "110-q008",
+    "year": 110,
+    "cat": "施工-輕隔間",
+    "type": "single",
+    "q": "輕隔間牆於接縫處分次塗佈填縫膠泥，主要目的在",
+    "o": {
+      "A": "增加價值感",
+      "B": "增加牆板厚實感",
+      "C": "避免填縫膠 泥乾縮",
+      "D": "防止濕氣"
+    },
+    "a": [
+      "C"
+    ],
+    "hint": "",
+    "src": "110年學科試題"
+  },
+  {
+    "id": "110-q009",
+    "year": 110,
+    "cat": "管理-估算",
+    "type": "single",
+    "q": "現有二塊木板尺寸分別為長度8 台尺、寬度3 台寸、厚度0.6 台寸，請問其總材積為？",
+    "o": {
+      "A": "2.88 才",
+      "B": "1.44 才",
+      "C": "14.4 才",
+      "D": "28.8 才"
+    },
+    "a": [
+      "A"
+    ],
+    "hint": "",
+    "src": "110年學科試題"
+  },
+  {
+    "id": "110-q010",
+    "year": 110,
+    "cat": "待分類",
+    "type": "single",
+    "q": "「勞工於職場上遭受主管或同事利用職務或地位上的優勢予以不當之對待，及遭受顧客、服務對 象或其他相關人士之肢體攻擊、言語侮辱、恐嚇、威脅等霸凌或暴力事件，致發生精神或身體上 的傷害」此等危害可歸類於下列何種職業危害？",
+    "o": {
+      "A": "社會心理性",
+      "B": "物理性",
+      "C": "化學性",
+      "D": "生物性"
+    },
+    "a": [
+      "A"
+    ],
+    "hint": "",
+    "src": "110年學科試題"
+  },
+  {
+    "id": "110-q011",
+    "year": 110,
+    "cat": "管理-估算",
+    "type": "single",
+    "q": "室內裝修工程中，如作業施工場所高度差超過",
+    "o": {
+      "A": "1",
+      "B": "1.5",
+      "C": "2",
+      "D": "2.5 公尺以上時，應設置能使勞工 安全上下之設備"
+    },
+    "a": [
+      "B"
+    ],
+    "hint": "",
+    "src": "110年學科試題"
+  },
+  {
+    "id": "110-q012",
+    "year": 110,
+    "cat": "施工-輕隔間",
+    "type": "single",
+    "q": "關於輕隔間的封面板施作，下述那一項是錯誤",
+    "o": {
+      "A": "面板以縱向固定為佳",
+      "B": "自攻螺絲固定的垂直間距 約為20-25 ㎝",
+      "C": "封板前應檢查面板是否完整無暇疵",
+      "D": "螺絲固定若產生歪斜，敲平整處理即可"
+    },
+    "a": [
+      "D"
+    ],
+    "hint": "",
+    "src": "110年學科試題"
+  },
+  {
+    "id": "110-q013",
+    "year": 110,
+    "cat": "待分類",
+    "type": "single",
+    "q": "雇主要求確實管制人員不得進入吊舉物下方，可避免下列何種災害發生？",
+    "o": {
+      "A": "感電",
+      "B": "物體飛落",
+      "C": "缺 氧",
+      "D": "墜落"
+    },
+    "a": [
+      "B"
+    ],
+    "hint": "",
+    "src": "110年學科試題"
+  },
+  {
+    "id": "110-q014",
+    "year": 110,
+    "cat": "施工-泥作",
+    "type": "single",
+    "q": "砌磚前應將磚",
+    "o": {
+      "A": "隨地亂放",
+      "B": "在烈日下曝曬乾",
+      "C": "充分吸收水份",
+      "D": "秤重量"
+    },
+    "a": [
+      "C"
+    ],
+    "hint": "",
+    "src": "110年學科試題"
+  },
+  {
+    "id": "110-q015",
+    "year": 110,
+    "cat": "管理-估算",
+    "type": "single",
+    "q": "一公尺約為多少台尺",
+    "o": {
+      "A": "3.3",
+      "B": "3.937",
+      "C": "3.025",
+      "D": "3.28"
+    },
+    "a": [
+      "A"
+    ],
+    "hint": "",
+    "src": "110年學科試題"
+  },
+  {
+    "id": "110-q016",
+    "year": 110,
+    "cat": "待分類",
+    "type": "single",
+    "q": "工地的照明與通風設施是屬於",
+    "o": {
+      "A": "管制環境",
+      "B": "作業環境",
+      "C": "休憩環境",
+      "D": "倉儲環境"
+    },
+    "a": [
+      "B"
+    ],
+    "hint": "",
+    "src": "110年學科試題"
+  },
+  {
+    "id": "110-q017",
+    "year": 110,
+    "cat": "待分類",
+    "type": "single",
+    "q": "抽屜為了開拉更方便，常於側板裝配那一種五金？",
+    "o": {
+      "A": "止木",
+      "B": "滑軌",
+      "C": "木釘",
+      "D": "活頁"
+    },
+    "a": [
+      "B"
+    ],
+    "hint": "",
+    "src": "110年學科試題"
+  },
+  {
+    "id": "110-q018",
+    "year": 110,
+    "cat": "待分類",
+    "type": "single",
+    "q": "任職於某公司的程式設計工程師，因職務所編寫之電腦程式，如果沒有特別以契約約定，則該電 腦程式重製之權利歸屬下列何者？",
+    "o": {
+      "A": "公司與編寫程式之工程師共有",
+      "B": "編寫程式之工程師",
+      "C": "公司",
+      "D": "公司全體股東共有"
+    },
+    "a": [
+      "C"
+    ],
+    "hint": "",
+    "src": "110年學科試題"
+  },
+  {
+    "id": "110-q019",
+    "year": 110,
+    "cat": "施工-泥作",
+    "type": "single",
+    "q": "砌磚摔漿的工具是以",
+    "o": {
+      "A": "水杓最好",
+      "B": "桃形鏝刀",
+      "C": "方鏟",
+      "D": "磚鏟"
+    },
+    "a": [
+      "B"
+    ],
+    "hint": "",
+    "src": "110年學科試題"
+  },
+  {
+    "id": "110-q020",
+    "year": 110,
+    "cat": "待分類",
+    "type": "single",
+    "q": "下列何種洗車方式無法節約用水？",
+    "o": {
+      "A": "用水桶及海綿抹布擦洗",
+      "B": "利用機械自動洗車，洗車水處理循 環使用",
+      "C": "使用有開關的水管可以隨時控制出水",
+      "D": "用水管強力沖洗"
+    },
+    "a": [
+      "D"
+    ],
+    "hint": "",
+    "src": "110年學科試題"
+  },
+  {
+    "id": "110-q021",
+    "year": 110,
+    "cat": "法規-建技規",
+    "type": "single",
+    "q": "下列何者不是「建築技術規則」規定之防火設備",
+    "o": {
+      "A": "室內消防栓",
+      "B": "裝設於防火區劃處之撒水幕",
+      "C": "防 火窗",
+      "D": "防火門"
+    },
+    "a": [
+      "A"
+    ],
+    "hint": "",
+    "src": "110年學科試題"
+  },
+  {
+    "id": "110-q022",
+    "year": 110,
+    "cat": "待分類",
+    "type": "single",
+    "q": "能掌握現存材料的種類及數量，檢視每日工作所需的材料是否夠用，是",
+    "o": {
+      "A": "物料管理",
+      "B": "人事管理",
+      "C": "工程管理",
+      "D": "財務管理"
+    },
+    "a": [
+      "A"
+    ],
+    "hint": "",
+    "src": "110年學科試題"
+  },
+  {
+    "id": "110-q023",
+    "year": 110,
+    "cat": "施工-泥作",
+    "type": "single",
+    "q": "室內裝修施工中較常遭遇感電災害的工作是",
+    "o": {
+      "A": "清理搬運",
+      "B": "框架拆除",
+      "C": "貼磁磚",
+      "D": "電動工具使用"
+    },
+    "a": [
+      "D"
+    ],
+    "hint": "",
+    "src": "110年學科試題"
+  },
+  {
+    "id": "110-q024",
+    "year": 110,
+    "cat": "共同-工倫",
+    "type": "single",
+    "q": "下列何者「違反」個人資料保護法？",
+    "o": {
+      "A": "縣市政府提供村里長轄區內符合資格之老人名冊供發放敬 老金",
+      "B": "學校將應屆畢業生之住家地址提供補習班招生使用",
+      "C": "網路購物公司為辦理退貨，將客戶之 住家地址提供予宅配公司",
+      "D": "公司基於人事管理之特定目的，張貼榮譽榜揭示績優員工姓名"
+    },
+    "a": [
+      "B"
+    ],
+    "hint": "",
+    "src": "110年學科試題"
+  },
+  {
+    "id": "110-q025",
+    "year": 110,
+    "cat": "施工-輕隔間",
+    "type": "single",
+    "q": "輕隔間牆使用岩綿填充牆體，主要目的在",
+    "o": {
+      "A": "增加價值感",
+      "B": "加強結構",
+      "C": "防火",
+      "D": "增加柔軟度"
+    },
+    "a": [
+      "C"
+    ],
+    "hint": "",
+    "src": "110年學科試題"
+  },
+  {
+    "id": "110-q026",
+    "year": 110,
+    "cat": "待分類",
+    "type": "single",
+    "q": "下列哪種措施不能用來降低空氣污染？",
+    "o": {
+      "A": "汰換老舊柴油車",
+      "B": "汽機車強制定期排氣檢測",
+      "C": "禁止露天 燃燒稻草",
+      "D": "汽機車加裝消音器"
+    },
+    "a": [
+      "D"
+    ],
+    "hint": "",
+    "src": "110年學科試題"
+  },
+  {
+    "id": "110-q027",
+    "year": 110,
+    "cat": "共同-工倫",
+    "type": "single",
+    "q": "有關著作權的下列敘述何者錯誤？",
+    "o": {
+      "A": "在網路散布盜版光碟，不管有沒有營利，會構成侵害著作權",
+      "B": "在網路的部落格看到一篇文章很棒，只要註明出處，就可以把文章複製在自己的部落格",
+      "C": "將補 習班老師的上課內容錄音檔，放到網路上拍賣，會構成侵害著作權",
+      "D": "撰寫碩博士論文時，在合理 範圍內引用他人的著作，只要註明出處，不會構成侵害著作權"
+    },
+    "a": [
+      "B"
+    ],
+    "hint": "",
+    "src": "110年學科試題"
+  },
+  {
+    "id": "110-q028",
+    "year": 110,
+    "cat": "待分類",
+    "type": "single",
+    "q": "勞工使用之移動梯，下列敘述何者有錯誤？",
+    "o": {
+      "A": "需有堅固之構造",
+      "B": "材質不得有顯著之損傷、腐蝕",
+      "C": "寬度應在20 ㎝以上",
+      "D": "應採取防止滑溜或其他防止轉動之必要措施"
+    },
+    "a": [
+      "C"
+    ],
+    "hint": "",
+    "src": "110年學科試題"
+  },
+  {
+    "id": "110-q029",
+    "year": 110,
+    "cat": "待分類",
+    "type": "single",
+    "q": "因為工作本身需要高度專業技術及知識，所以在對客戶服務時應",
+    "o": {
+      "A": "不用理會顧客的意見",
+      "B": "以專業 機密為由，不用對客戶說明及解釋",
+      "C": "若價錢較低，就敷衍了事",
+      "D": "保持親切、真誠、客戶至上的態 度"
+    },
+    "a": [
+      "D"
+    ],
+    "hint": "",
+    "src": "110年學科試題"
+  },
+  {
+    "id": "110-q030",
+    "year": 110,
+    "cat": "法規-建技規",
+    "type": "single",
+    "q": "依「建築技術規則」規定，自室內經由陽台或排煙室始得進入之安全梯，稱為",
+    "o": {
+      "A": "一般安全梯",
+      "B": "室 內安全梯",
+      "C": "特別安全梯",
+      "D": "戶外安全梯"
+    },
+    "a": [
+      "C"
+    ],
+    "hint": "",
+    "src": "110年學科試題"
+  },
+  {
+    "id": "110-q031",
+    "year": 110,
+    "cat": "法規-建技規",
+    "type": "single",
+    "q": "依「建築技術規則」規定，特別安全梯之樓梯間及排煙室之四週牆壁，應具有一小時以上防火時 效，其天花板及牆面之裝修，應為",
+    "o": {
+      "A": "耐燃三級",
+      "B": "耐燃二級",
+      "C": "耐燃四級",
+      "D": "耐燃一級 材料"
+    },
+    "a": [
+      "D"
+    ],
+    "hint": "",
+    "src": "110年學科試題"
+  },
+  {
+    "id": "110-q032",
+    "year": 110,
+    "cat": "圖說判讀",
+    "type": "single",
+    "q": "申請室內裝修審核圖說時之裝修詳細圖之比例尺不得小於",
+    "o": {
+      "A": "三十分之一",
+      "B": "五十分之一",
+      "C": "一百分之 一",
+      "D": "二百分之一"
+    },
+    "a": [
+      "A"
+    ],
+    "hint": "",
+    "src": "110年學科試題"
+  },
+  {
+    "id": "110-q033",
+    "year": 110,
+    "cat": "施工-水電",
+    "type": "single",
+    "q": "依中華民國國家標準CNS 規定，在電氣設備圖說標準圖例中 表示",
+    "o": {
+      "A": "分電盤",
+      "B": "漏電開關箱",
+      "C": "安全開關",
+      "D": "電燈總配電盤"
+    },
+    "a": [
+      "D"
+    ],
+    "hint": "",
+    "src": "110年學科試題"
+  },
+  {
+    "id": "110-q034",
+    "year": 110,
+    "cat": "法規-室裝辦法",
+    "type": "single",
+    "q": "室內裝修從業者指不包括",
+    "o": {
+      "A": "土木技師",
+      "B": "營造業",
+      "C": "開業建築師",
+      "D": "室內裝修業"
+    },
+    "a": [
+      "A"
+    ],
+    "hint": "",
+    "src": "110年學科試題"
+  },
+  {
+    "id": "110-q035",
+    "year": 110,
+    "cat": "待分類",
+    "type": "single",
+    "q": "廚房設置之排油煙機為下列何者？",
+    "o": {
+      "A": "吹吸型換氣裝置",
+      "B": "整體換氣裝置",
+      "C": "局部排氣裝置",
+      "D": "排氣煙 囪"
+    },
+    "a": [
+      "C"
+    ],
+    "hint": "",
+    "src": "110年學科試題"
+  },
+  {
+    "id": "110-q036",
+    "year": 110,
+    "cat": "管理-估算",
+    "type": "single",
+    "q": "標示為1：50 比例之書櫃立面圖，用一般的尺去量有2 公分寬、4 公分高，其實際的面積為多少 m2",
+    "o": {
+      "A": "2",
+      "B": "6",
+      "C": "8",
+      "D": "4"
+    },
+    "a": [
+      "A"
+    ],
+    "hint": "",
+    "src": "110年學科試題"
+  },
+  {
+    "id": "110-q037",
+    "year": 110,
+    "cat": "法規-消防",
+    "type": "single",
+    "q": "下列何者不屬於弱電設備",
+    "o": {
+      "A": "電話系統",
+      "B": "播音、廣播系統",
+      "C": "緊急照明系統",
+      "D": "火警警報器"
+    },
+    "a": [
+      "C"
+    ],
+    "hint": "",
+    "src": "110年學科試題"
+  },
+  {
+    "id": "110-q038",
+    "year": 110,
+    "cat": "管理-估算",
+    "type": "single",
+    "q": "一坪不等於",
+    "o": {
+      "A": "36 才",
+      "B": "6 台尺×6 台尺",
+      "C": "1.8m×1.8m",
+      "D": "30.3m 2"
+    },
+    "a": [
+      "D"
+    ],
+    "hint": "",
+    "src": "110年學科試題"
+  },
+  {
+    "id": "110-q039",
+    "year": 110,
+    "cat": "施工-木作",
+    "type": "single",
+    "q": "下列敘述，何者為錯誤？",
+    "o": {
+      "A": "1 甲=3000 坪",
+      "B": "布捲尺測量比鋼尺測量誤差大",
+      "C": "木材可以「才」作為 計算單位",
+      "D": "放樣工作重要，必須小心謹慎"
+    },
+    "a": [
+      "A"
+    ],
+    "hint": "",
+    "src": "110年學科試題"
+  },
+  {
+    "id": "110-q040",
+    "year": 110,
+    "cat": "圖說判讀",
+    "type": "single",
+    "q": "依中華民國國家標準CNS 規定，建築圖符號及圖例，下圖之門窗編號符號代表為何？",
+    "o": {
+      "A": "普通窗",
+      "B": "落地窗",
+      "C": "甲種防火窗",
+      "D": "氣密窗"
+    },
+    "a": [
+      "A"
+    ],
+    "hint": "",
+    "src": "110年學科試題"
+  },
+  {
+    "id": "110-q041",
+    "year": 110,
+    "cat": "待分類",
+    "type": "single",
+    "q": "下列何者樹種為闊葉樹種",
+    "o": {
+      "A": "檜木",
+      "B": "雲杉",
+      "C": "梧桐",
+      "D": "肖楠"
+    },
+    "a": [
+      "C"
+    ],
+    "hint": "",
+    "src": "110年學科試題"
+  },
+  {
+    "id": "110-q042",
+    "year": 110,
+    "cat": "共同-職安",
+    "type": "single",
+    "q": "下列關於膠合玻璃的敘述那一項是錯誤？",
+    "o": {
+      "A": "利用高溫高壓在中間夾PVB 樹脂膜而成",
+      "B": "具有隔音效 果",
+      "C": "中間膜的選擇多，使玻璃具有美感",
+      "D": "安全性高但不具節能效率"
+    },
+    "a": [
+      "D"
+    ],
+    "hint": "",
+    "src": "110年學科試題"
+  },
+  {
+    "id": "110-q043",
+    "year": 110,
+    "cat": "法規-室裝辦法",
+    "type": "single",
+    "q": "開業建築師所簽證符合規定之替代現況圖之比例尺不得小於",
+    "o": {
+      "A": "五十分之一",
+      "B": "五百分之一",
+      "C": "二百分 之一",
+      "D": "一百分之一"
+    },
+    "a": [
+      "C"
+    ],
+    "hint": "",
+    "src": "110年學科試題"
+  },
+  {
+    "id": "110-q044",
+    "year": 110,
+    "cat": "施工-塗裝",
+    "type": "single",
+    "q": "輕隔間上下槽立柱多半採用",
+    "o": {
+      "A": "熱浸鍍鋅",
+      "B": "預力",
+      "C": "紅丹防銹",
+      "D": "鍍鋅塗裝 輕量型鋼"
+    },
+    "a": [
+      "A"
+    ],
+    "hint": "",
+    "src": "110年學科試題"
+  },
+  {
+    "id": "110-q045",
+    "year": 110,
+    "cat": "待分類",
+    "type": "single",
+    "q": "解決台灣水荒(缺水)問題的無效對策是",
+    "o": {
+      "A": "興建水庫、蓄洪(豐)濟枯",
+      "B": "水資源重複利用，海水淡 化…等",
+      "C": "積極推動全民體育運動",
+      "D": "全面節約用水"
+    },
+    "a": [
+      "C"
+    ],
+    "hint": "",
+    "src": "110年學科試題"
+  },
+  {
+    "id": "110-q046",
+    "year": 110,
+    "cat": "管理-估算",
+    "type": "single",
+    "q": "一空間為長5m、寬4m、高3m，若地面全部鋪設瓷磚施工，其數量共計為",
+    "o": {
+      "A": "6.05 坪",
+      "B": "18.15 平方 公尺",
+      "C": "18.15 坪",
+      "D": "6.05 平方公尺"
+    },
+    "a": [
+      "A"
+    ],
+    "hint": "",
+    "src": "110年學科試題"
+  },
+  {
+    "id": "110-q047",
+    "year": 110,
+    "cat": "施工-泥作",
+    "type": "single",
+    "q": "構造物之剖面圖，如右圖上層細線 是表示",
+    "o": {
+      "A": "油漆",
+      "B": "粉刷",
+      "C": "不須加工",
+      "D": "敲平"
+    },
+    "a": [
+      "B"
+    ],
+    "hint": "",
+    "src": "110年學科試題"
+  },
+  {
+    "id": "110-q048",
+    "year": 110,
+    "cat": "施工-輕隔間",
+    "type": "single",
+    "q": "勞工於礦纖板、石膏板等材料構築之夾層天花板從事作業，為防止勞工踏穿墜落，規劃安全通道 時，於天花板支架上架設適當強度且寬度在多少公分以上之踏板？",
+    "o": {
+      "A": "10",
+      "B": "30",
+      "C": "40",
+      "D": "20"
+    },
+    "a": [
+      "B"
+    ],
+    "hint": "",
+    "src": "110年學科試題"
+  },
+  {
+    "id": "110-q049",
+    "year": 110,
+    "cat": "待分類",
+    "type": "single",
+    "q": "在生物鏈越上端的物種其體內累積持久性有機污染物(POPs)濃度將越高，危害性也將越大，這是 說明POPs 具有下列何種特性？",
+    "o": {
+      "A": "高毒性",
+      "B": "持久性",
+      "C": "半揮發性",
+      "D": "生物累積性"
+    },
+    "a": [
+      "D"
+    ],
+    "hint": "",
+    "src": "110年學科試題"
+  },
+  {
+    "id": "110-q050",
+    "year": 110,
+    "cat": "施工-泥作",
+    "type": "single",
+    "q": "關於輕隔間的施工程序，下述那一項是對的",
+    "o": {
+      "A": "放樣→上下料及立柱角材安裝→管路埋設及隔音/隔 熱材填充→封板→批土→完工",
+      "B": "放樣→上下料及立柱角材安裝→第一面封板→管路埋設及隔音/隔 熱材填充→第二面封板→批土→完工",
+      "C": "上下料及立柱角材安裝→管路埋設→隔音/隔熱材填充→封 板→批土→完工",
+      "D": "放樣→管路埋設→上下料及立柱角材安裝→第一面封板→隔音/隔熱材填充→第 二面封板→批土→完工"
+    },
+    "a": [
+      "B"
+    ],
+    "hint": "",
+    "src": "110年學科試題"
+  },
+  {
+    "id": "110-q051",
+    "year": 110,
+    "cat": "待分類",
+    "type": "single",
+    "q": "眼內噴入化學物或其他異物，應立即使用下列何者沖洗眼睛？",
+    "o": {
+      "A": "清水",
+      "B": "蘇打水",
+      "C": "稀釋的醋",
+      "D": "牛 奶"
+    },
+    "a": [
+      "A"
+    ],
+    "hint": "",
+    "src": "110年學科試題"
+  },
+  {
+    "id": "110-q052",
+    "year": 110,
+    "cat": "待分類",
+    "type": "single",
+    "q": "鋸切美耐板時應選用下列何種鋸片？",
+    "o": {
+      "A": "鋸齒角度較小之鋸片",
+      "B": "鋸齒角度較大之鋸片",
+      "C": "鋸齒數較多 之鋸片",
+      "D": "鋸齒數較少之鋸片"
+    },
+    "a": [
+      "C"
+    ],
+    "hint": "",
+    "src": "110年學科試題"
+  },
+  {
+    "id": "110-q053",
+    "year": 110,
+    "cat": "待分類",
+    "type": "single",
+    "q": "下列那種不適合作為銲接的檢驗法？",
+    "o": {
+      "A": "敲擊法",
+      "B": "射線照像法",
+      "C": "滲透液法",
+      "D": "超音波法"
+    },
+    "a": [
+      "A"
+    ],
+    "hint": "",
+    "src": "110年學科試題"
+  },
+  {
+    "id": "110-q054",
+    "year": 110,
+    "cat": "施工-木作",
+    "type": "single",
+    "q": "一般裝潢木工較常使用何種手工之鋸切工具？",
+    "o": {
+      "A": "折合鋸",
+      "B": "美式板鋸",
+      "C": "框鋸",
+      "D": "鋼鋸"
+    },
+    "a": [
+      "A"
+    ],
+    "hint": "",
+    "src": "110年學科試題"
+  },
+  {
+    "id": "110-q055",
+    "year": 110,
+    "cat": "施工-水電",
+    "type": "single",
+    "q": "管徑100 公厘以下之排水橫管，清潔口間距不得超過",
+    "o": {
+      "A": "30",
+      "B": "20",
+      "C": "15",
+      "D": "25 公尺"
+    },
+    "a": [
+      "C"
+    ],
+    "hint": "",
+    "src": "110年學科試題"
+  },
+  {
+    "id": "110-q056",
+    "year": 110,
+    "cat": "法規-建技規",
+    "type": "single",
+    "q": "丈量現況柱、梁尺寸的目的，以下敘述何者為錯誤？",
+    "o": {
+      "A": "判斷建築物結構配置情形",
+      "B": "控制其影響空 間設計的因素",
+      "C": "為計算敲除數量的依據",
+      "D": "為分間牆配置的參考依據"
+    },
+    "a": [
+      "C"
+    ],
+    "hint": "",
+    "src": "110年學科試題"
+  },
+  {
+    "id": "110-q057",
+    "year": 110,
+    "cat": "待分類",
+    "type": "single",
+    "q": "「酸雨」定義為雨水酸鹼值達多少以下時稱之？",
+    "o": {
+      "A": "6.0",
+      "B": "8.0",
+      "C": "5.0",
+      "D": "7.0"
+    },
+    "a": [
+      "C"
+    ],
+    "hint": "",
+    "src": "110年學科試題"
+  },
+  {
+    "id": "110-q058",
+    "year": 110,
+    "cat": "共同-環保",
+    "type": "single",
+    "q": "下列哪一種氣體較易造成臭氧層被嚴重的破壞？",
+    "o": {
+      "A": "二氧化硫",
+      "B": "氟氯碳化物",
+      "C": "二氧化碳",
+      "D": "氮氧化合 物"
+    },
+    "a": [
+      "B"
+    ],
+    "hint": "",
+    "src": "110年學科試題"
+  },
+  {
+    "id": "110-q059",
+    "year": 110,
+    "cat": "施工-泥作",
+    "type": "single",
+    "q": "下列那一項砌磚牆的觀念是錯誤",
+    "o": {
+      "A": "牆身之接縫以破縫為原則",
+      "B": "砌築時磚塊要保持乾燥以保持強度",
+      "C": "接縫成一鉛垂線會導致載重集中",
+      "D": "上下疊砌需交互搭扣"
+    },
+    "a": [
+      "B"
+    ],
+    "hint": "",
+    "src": "110年學科試題"
+  },
+  {
+    "id": "110-q060",
+    "year": 110,
+    "cat": "圖說判讀",
+    "type": "single",
+    "q": "材料構造圖例中 代表",
+    "o": {
+      "A": "地毯",
+      "B": "窗簾",
+      "C": "鬆軟之保溫吸音材疊席類",
+      "D": "輕質牆"
+    },
+    "a": [
+      "C"
+    ],
+    "hint": "",
+    "src": "110年學科試題"
+  },
+  {
+    "id": "110-q061",
+    "year": 110,
+    "cat": "法規-建技規",
+    "type": "multi",
+    "q": "丈量室内裝修工地現場柱、樑尺寸的目的，下列敘述何者正確？",
+    "o": {
+      "A": "作為分間牆配置的參考依據",
+      "B": "計算拆除數量的依據",
+      "C": "掌握空間設計的影響因素",
+      "D": "了解建築物結構配置情形"
+    },
+    "a": [
+      "A",
+      "C",
+      "D"
+    ],
+    "hint": "",
+    "src": "110年學科試題"
+  },
+  {
+    "id": "110-q062",
+    "year": 110,
+    "cat": "待分類",
+    "type": "multi",
+    "q": "地毯的種類可區分多種，如依規格分，哪些是正確",
+    "o": {
+      "A": "活動塊狀地毯",
+      "B": "無縫地毯",
+      "C": "整捲地毯",
+      "D": "單片 組合地毯"
+    },
+    "a": [
+      "A",
+      "B",
+      "C"
+    ],
+    "hint": "",
+    "src": "110年學科試題"
+  },
+  {
+    "id": "110-q063",
+    "year": 110,
+    "cat": "共同-職安",
+    "type": "multi",
+    "q": "依職業安全衛生相關法規，所定安全衛生工作守則之內容，必須參酌定之者，下列哪些是正確？",
+    "o": {
+      "A": "急救及搶救",
+      "B": "防護設備之準備、維持及使用",
+      "C": "遇事故不必通報及報告",
+      "D": "工作安全及衛生標準"
+    },
+    "a": [
+      "A",
+      "B",
+      "D"
+    ],
+    "hint": "",
+    "src": "110年學科試題"
+  },
+  {
+    "id": "110-q064",
+    "year": 110,
+    "cat": "待分類",
+    "type": "multi",
+    "q": "地面樓層達十一層以上建築物室內裝修，下列哪些材料應使用附有防焰標示？",
+    "o": {
+      "A": "桌布",
+      "B": "窗簾",
+      "C": "布 幕",
+      "D": "地毯"
+    },
+    "a": [
+      "B",
+      "C",
+      "D"
+    ],
+    "hint": "",
+    "src": "110年學科試題"
+  },
+  {
+    "id": "110-q065",
+    "year": 110,
+    "cat": "施工-木作",
+    "type": "multi",
+    "q": "下列施工機(器)具之功能，哪些為不正確？",
+    "o": {
+      "A": "震動電鑽為鑽頭前端迴轉的同時，鑽軸同時作高速 往復震動，此種手電鑽最適合在硬質木板上作鑽孔操作",
+      "B": "手提式電動圓鋸機，又稱為電動手鋸， 可用於多種鋸割，尤其適用於小面積的嵌板鋸割",
+      "C": "手電鑽為木工工作鑽孔用",
+      "D": "手提式電動線鋸機 不但可鋸切外曲線，也可以鋸切封閉曲線"
+    },
+    "a": [
+      "A",
+      "B"
+    ],
+    "hint": "",
+    "src": "110年學科試題"
+  },
+  {
+    "id": "110-q066",
+    "year": 110,
+    "cat": "待分類",
+    "type": "multi",
+    "q": "勞工以電銲、氣焊從事熔接、熔斷等作業時，何者為應置備之護具？",
+    "o": {
+      "A": "防護眼鏡",
+      "B": "耳塞",
+      "C": "防護手 套",
+      "D": "安全面罩"
+    },
+    "a": [
+      "A",
+      "C",
+      "D"
+    ],
+    "hint": "",
+    "src": "110年學科試題"
+  },
+  {
+    "id": "110-q067",
+    "year": 110,
+    "cat": "施工-塗裝",
+    "type": "multi",
+    "q": "以下是塗裝適用性之條件的敘述，何者正確？",
+    "o": {
+      "A": "好塗料是指半成品的塗料品質必須良好，具備各 性能皆優秀之塗料",
+      "B": "好設計是指應選擇能配合塗料及被塗物之適當塗裝系",
+      "C": "好價格一定能達到圓 滿的塗裝結果",
+      "D": "好管理是指應施於充分的塗裝作業管理"
+    },
+    "a": [
+      "A",
+      "B",
+      "D"
+    ],
+    "hint": "",
+    "src": "110年學科試題"
+  },
+  {
+    "id": "110-q068",
+    "year": 110,
+    "cat": "施工-泥作",
+    "type": "multi",
+    "q": "瓷磚剝落之原因有下列哪些？",
+    "o": {
+      "A": "瓷磚界面，牆體界面，瓷磚的伸縮縫未妥善預留",
+      "B": "膠泥塗佈厚度 不足或嵌入不足",
+      "C": "瓷磚品質不良或龜裂，黏著劑強度不足或是黏著與水泥砂漿的界面的破壞",
+      "D": "瓷 磚黏著施工時機妥善掌握"
+    },
+    "a": [
+      "A",
+      "B",
+      "C"
+    ],
+    "hint": "",
+    "src": "110年學科試題"
+  },
+  {
+    "id": "110-q069",
+    "year": 110,
+    "cat": "共同-職安",
+    "type": "multi",
+    "q": "依職業安全衛生設施規則規定，雇主使勞工以捲揚機等吊運物料時之規定下列哪些正確？",
+    "o": {
+      "A": "錨錠 及吊掛用之吊鏈、鋼索、掛鉤、纖維索等吊具有異狀時應即修換",
+      "B": "吊鉤或吊具應有防止吊舉中所 吊物體脫落之裝置",
+      "C": "吊掛之重量不得超過該設備所能承受之最高負荷，且應加以標示",
+      "D": "可得供人 員搭乘、吊升或降落"
+    },
+    "a": [
+      "A",
+      "B",
+      "C"
+    ],
+    "hint": "",
+    "src": "110年學科試題"
+  },
+  {
+    "id": "110-q070",
+    "year": 110,
+    "cat": "圖說判讀",
+    "type": "multi",
+    "q": "依據CNS11567-A1042 建築製圖規定，有關線條用途種類中，「虛線」之用途為",
+    "o": {
+      "A": "地界線",
+      "B": "配管",
+      "C": "中心線",
+      "D": "隱蔽線"
+    },
+    "a": [
+      "B",
+      "D"
+    ],
+    "hint": "",
+    "src": "110年學科試題"
+  },
+  {
+    "id": "110-q071",
+    "year": 110,
+    "cat": "待分類",
+    "type": "multi",
+    "q": "積層材指利用小或薄材膠合成大或厚材，一般均以",
+    "o": {
+      "A": "尿素膠",
+      "B": "水膠",
+      "C": "環氧樹酯",
+      "D": "羅馬膠 加壓膠 合"
+    },
+    "a": [
+      "A",
+      "B",
+      "D"
+    ],
+    "hint": "",
+    "src": "110年學科試題"
+  },
+  {
+    "id": "110-q072",
+    "year": 110,
+    "cat": "法規-消防",
+    "type": "multi",
+    "q": "依中華民國國家標準CNS11567 之A1042 建築設備圖表示法規定，下列設備符號表示何者不正 確？",
+    "o": {
+      "A": "表示避難方向指標",
+      "B": "表示接地型單地板插座",
+      "C": "表示水霧自動灑水頭",
+      "D": "表示接地型專用單插座"
+    },
+    "a": [
+      "B",
+      "C"
+    ],
+    "hint": "",
+    "src": "110年學科試題"
+  },
+  {
+    "id": "110-q073",
+    "year": 110,
+    "cat": "施工-塗裝",
+    "type": "multi",
+    "q": "有關裝修塗裝作業，下列敘述何者正確？",
+    "o": {
+      "A": "各塗裝工程，不須預先施行被塗物表面處理",
+      "B": "塗裝說 明書係對塗裝施工內容、質量作較詳細規範者，亦即明示在施工上所要遵守的各種條件及最終修 飾程度",
+      "C": "塗裝工程之計畫明細表如塗裝工程表及塗裝說明書，有利塗裝施工順利進行，並可作為 塗裝施工完成時之驗收依據，預防可能之驗收糾紛",
+      "D": "塗裝工程表係簡單明瞭表示塗裝施工程序， 惟對最終修飾程度不詳列"
+    },
+    "a": [
+      "B",
+      "C",
+      "D"
+    ],
+    "hint": "",
+    "src": "110年學科試題"
+  },
+  {
+    "id": "110-q074",
+    "year": 110,
+    "cat": "管理-進度",
+    "type": "multi",
+    "q": "關於工程日報表的紀錄，以下哪些是所要掌握的資訊？",
+    "o": {
+      "A": "工程執行進度",
+      "B": "材料使用數量",
+      "C": "施工者 的情緒",
+      "D": "氣候對工期影響"
+    },
+    "a": [
+      "A",
+      "B",
+      "D"
+    ],
+    "hint": "",
+    "src": "110年學科試題"
+  },
+  {
+    "id": "110-q075",
+    "year": 110,
+    "cat": "共同-職安",
+    "type": "multi",
+    "q": "依職業安全衛生設施規則規定，雇主對於使用之移動梯，下列哪些為正確？",
+    "o": {
+      "A": "應採取防止滑溜或 其他防止轉動之必要措施",
+      "B": "具有堅固之構造",
+      "C": "其材質不得有顯著之損傷、腐蝕等現象",
+      "D": "寬度應在 16.5 公分以上"
+    },
+    "a": [
+      "A",
+      "B",
+      "C"
+    ],
+    "hint": "",
+    "src": "110年學科試題"
+  },
+  {
+    "id": "110-q076",
+    "year": 110,
+    "cat": "丈量放樣",
+    "type": "multi",
+    "q": "下列哪些為室內裝修垂直放樣工具？",
+    "o": {
+      "A": "透明水管",
+      "B": "錘球",
+      "C": "經緯儀",
+      "D": "平板儀"
+    },
+    "a": [
+      "B",
+      "C"
+    ],
+    "hint": "",
+    "src": "110年學科試題"
+  },
+  {
+    "id": "110-q077",
+    "year": 110,
+    "cat": "施工-塗裝",
+    "type": "multi",
+    "q": "為達成塗裝預期效果，應注意塗裝材料之選擇及確認，下列敘述何者正確？",
+    "o": {
+      "A": "塗裝材料若CNS 有 制定者，原則上應使用符合CNS 標準者",
+      "B": "特別記載之說明書上無指示時，應預先對其製造業者、 製品等徵求有關人員的確認",
+      "C": "塗裝材料應將其標籤完整保持，可在已開罐狀態下搬入塗裝現場",
+      "D": "塗裝材料應接受有關人員的確認其名稱及種別、製造年月日及數量"
+    },
+    "a": [
+      "A",
+      "B",
+      "D"
+    ],
+    "hint": "",
+    "src": "110年學科試題"
+  },
+  {
+    "id": "110-q078",
+    "year": 110,
+    "cat": "待分類",
+    "type": "multi",
+    "q": "面磚之優點有下列哪些？",
+    "o": {
+      "A": "穩定性高不變形，不褪色及伸縮率低",
+      "B": "成品之色彩，容易變色",
+      "C": "硬度 高耐蝕，耐酸及耐鹽",
+      "D": "耐候力強，不老化，耐水，耐火，耐磨及耐高壓"
+    },
+    "a": [
+      "A",
+      "C",
+      "D"
+    ],
+    "hint": "",
+    "src": "110年學科試題"
+  },
+  {
+    "id": "110-q079",
+    "year": 110,
+    "cat": "待分類",
+    "type": "multi",
+    "q": "水泥之運送、儲存及處理，下列敘述哪些正確？",
+    "o": {
+      "A": "散裝水泥應儲存在乾燥防水之槽斗內，袋裝水 泥應儲存在乾燥防水之庫房或經工程司同意之建築物內",
+      "B": "袋裝水泥儲存應置於高出地面至少5CM 之地板上，水泥堆放高度不得超過13 袋",
+      "C": "已結塊或工程司認為已變質之水泥，不得使用於本工 程，並應立即整批運離工地",
+      "D": "原則上水泥應以散裝運至預拌廠之水泥槽斗儲存"
+    },
+    "a": [
+      "A",
+      "C",
+      "D"
+    ],
+    "hint": "",
+    "src": "110年學科試題"
+  },
+  {
+    "id": "110-q080",
+    "year": 110,
+    "cat": "管理-估算",
+    "type": "multi",
+    "q": "下列面積計算及單位換算何者正確？",
+    "o": {
+      "A": "長18 台尺×寬12 台尺＝4 坪",
+      "B": "長8 公尺×寬5 公尺＝40 平 方公尺約為12.1 坪",
+      "C": "長12.5 公尺×寬8 公尺＝100 平方公尺約為30.25 坪",
+      "D": "長9 台尺×寬4 台尺＝ 1 坪"
+    },
+    "a": [
+      "B",
+      "C",
+      "D"
+    ],
+    "hint": "",
+    "src": "110年學科試題"
+  },
+  {
+    "id": "111-q001",
+    "year": 111,
+    "cat": "待分類",
+    "type": "single",
+    "q": "公司負責人為了要節省開銷，將員工薪資以高報低來投保全民健保及勞保，是觸犯了刑法上之何 種罪刑？",
+    "o": {
+      "A": "侵占罪",
+      "B": "工商秘密罪",
+      "C": "背信罪",
+      "D": "詐欺罪"
+    },
+    "a": [
+      "D"
+    ],
+    "hint": "",
+    "src": "111年學科試題"
+  },
+  {
+    "id": "111-q002",
+    "year": 111,
+    "cat": "施工-泥作",
+    "type": "single",
+    "q": "在機具及電源附近要儘量避免堆置",
+    "o": {
+      "A": "泥作材料",
+      "B": "衛浴器材",
+      "C": "磁場器材",
+      "D": "易燃物"
+    },
+    "a": [
+      "D"
+    ],
+    "hint": "",
+    "src": "111年學科試題"
+  },
+  {
+    "id": "111-q003",
+    "year": 111,
+    "cat": "施工機具",
+    "type": "single",
+    "q": "下列何項不是手工具所造成傷害的直接因素",
+    "o": {
+      "A": "衝擊",
+      "B": "感電",
+      "C": "場所零亂",
+      "D": "割切"
+    },
+    "a": [
+      "C"
+    ],
+    "hint": "",
+    "src": "111年學科試題"
+  },
+  {
+    "id": "111-q004",
+    "year": 111,
+    "cat": "施工-木作",
+    "type": "single",
+    "q": "一般裝潢木工較常使用何種手工之鋸切工具？",
+    "o": {
+      "A": "折合鋸",
+      "B": "鋼鋸",
+      "C": "框鋸",
+      "D": "美式板鋸"
+    },
+    "a": [
+      "A"
+    ],
+    "hint": "",
+    "src": "111年學科試題"
+  },
+  {
+    "id": "111-q005",
+    "year": 111,
+    "cat": "待分類",
+    "type": "single",
+    "q": "室內裝修工程中，對於建築物中之非結構分間磚牆之拆除時，應",
+    "o": {
+      "A": "自上至下",
+      "B": "自右至左",
+      "C": "自左至 右",
+      "D": "自下至上 ，逐次拆除"
+    },
+    "a": [
+      "A"
+    ],
+    "hint": "",
+    "src": "111年學科試題"
+  },
+  {
+    "id": "111-q006",
+    "year": 111,
+    "cat": "施工-木作",
+    "type": "single",
+    "q": "板面貼覆有美耐板之工作物，以何種手工具修整邊緣較適合？",
+    "o": {
+      "A": "美耐板專用鉋刀",
+      "B": "粗平鉋",
+      "C": "長鉋",
+      "D": "細平鉋"
+    },
+    "a": [
+      "A"
+    ],
+    "hint": "",
+    "src": "111年學科試題"
+  },
+  {
+    "id": "111-q007",
+    "year": 111,
+    "cat": "待分類",
+    "type": "single",
+    "q": "木心板作曲線結構下列何種加工方法最正確？",
+    "o": {
+      "A": "將板材浸泡水裡",
+      "B": "取適當等距間格，鋸切深度約 5/6",
+      "C": "用熱水軟化",
+      "D": "使用噴燈烘烤"
+    },
+    "a": [
+      "B"
+    ],
+    "hint": "",
+    "src": "111年學科試題"
+  },
+  {
+    "id": "111-q008",
+    "year": 111,
+    "cat": "圖說判讀",
+    "type": "single",
+    "q": "施工圖面常用文字簡寫符號中DW 代表",
+    "o": {
+      "A": "下樓",
+      "B": "落地窗",
+      "C": "門連窗",
+      "D": "門"
+    },
+    "a": [
+      "C"
+    ],
+    "hint": "",
+    "src": "111年學科試題"
+  },
+  {
+    "id": "111-q009",
+    "year": 111,
+    "cat": "管理-驗收",
+    "type": "single",
+    "q": "以下何者是消除職業病發生率之源頭管理對策？",
+    "o": {
+      "A": "多運動",
+      "B": "改善作業環境",
+      "C": "使用個人防護具",
+      "D": "健 康檢查"
+    },
+    "a": [
+      "B"
+    ],
+    "hint": "",
+    "src": "111年學科試題"
+  },
+  {
+    "id": "111-q010",
+    "year": 111,
+    "cat": "施工-輕隔間",
+    "type": "single",
+    "q": "輕隔間牆使用接縫貼紙，主要目的在",
+    "o": {
+      "A": "增加牆板柔軟度",
+      "B": "防止濕氣",
+      "C": "加強牆板結構",
+      "D": "修飾接縫"
+    },
+    "a": [
+      "D"
+    ],
+    "hint": "",
+    "src": "111年學科試題"
+  },
+  {
+    "id": "111-q011",
+    "year": 111,
+    "cat": "法規-建技規",
+    "type": "single",
+    "q": "依「建築技術規則」規定，在標準耐火試驗條件下，建築構造當其一面受火時，能在一定時間 內，其非加熱面溫度不超過規定值之能力，稱為",
+    "o": {
+      "A": "阻熱性",
+      "B": "防焰性",
+      "C": "不燃性",
+      "D": "耐燃性"
+    },
+    "a": [
+      "A"
+    ],
+    "hint": "",
+    "src": "111年學科試題"
+  },
+  {
+    "id": "111-q012",
+    "year": 111,
+    "cat": "法規-職安",
+    "type": "single",
+    "q": "材料進場吊放，捲揚機具作業指揮最應防止可能的災害是",
+    "o": {
+      "A": "感電",
+      "B": "物體飛落",
+      "C": "有害氣體中毒",
+      "D": "缺 氧窒息"
+    },
+    "a": [
+      "B"
+    ],
+    "hint": "",
+    "src": "111年學科試題"
+  },
+  {
+    "id": "111-q013",
+    "year": 111,
+    "cat": "待分類",
+    "type": "single",
+    "q": "為達成玻璃或鏡面接縫填補效果良好，宜將灌裝於筒狀容器之矽力康膠，於施打時配合用",
+    "o": {
+      "A": "填縫 槍",
+      "B": "罐裝瓦斯",
+      "C": "空壓機",
+      "D": "噴槍 將矽力康膠均勻壓出至接縫處，再以刮刀修平"
+    },
+    "a": [
+      "A"
+    ],
+    "hint": "",
+    "src": "111年學科試題"
+  },
+  {
+    "id": "111-q014",
+    "year": 111,
+    "cat": "管理-驗收",
+    "type": "single",
+    "q": "可藉由下列何者改善河川水質且兼具提供動植物良好棲地環境？",
+    "o": {
+      "A": "人工溼地",
+      "B": "運動公園",
+      "C": "滯洪池",
+      "D": "水庫"
+    },
+    "a": [
+      "A"
+    ],
+    "hint": "",
+    "src": "111年學科試題"
+  },
+  {
+    "id": "111-q015",
+    "year": 111,
+    "cat": "施工-金屬",
+    "type": "single",
+    "q": "酸雨對土壤可能造成的影響，下列何者正確？",
+    "o": {
+      "A": "土壤液化",
+      "B": "土壤礦化",
+      "C": "土壤更肥沃",
+      "D": "土壤中的重 金屬釋出"
+    },
+    "a": [
+      "D"
+    ],
+    "hint": "",
+    "src": "111年學科試題"
+  },
+  {
+    "id": "111-q016",
+    "year": 111,
+    "cat": "圖說判讀",
+    "type": "single",
+    "q": "依中華民國國家標準CNS 規定，在圖樣圖式準則中，尺度線應使用",
+    "o": {
+      "A": "虛線",
+      "B": "細實線",
+      "C": "中實線",
+      "D": "粗 實線"
+    },
+    "a": [
+      "B"
+    ],
+    "hint": "",
+    "src": "111年學科試題"
+  },
+  {
+    "id": "111-q017",
+    "year": 111,
+    "cat": "施工-塗裝",
+    "type": "single",
+    "q": "油漆溶劑剩料傾入排水管內會產生",
+    "o": {
+      "A": "滑潤",
+      "B": "管壁增厚",
+      "C": "變形腐蝕破裂",
+      "D": "打通堵塞之情況"
+    },
+    "a": [
+      "C"
+    ],
+    "hint": "",
+    "src": "111年學科試題"
+  },
+  {
+    "id": "111-q018",
+    "year": 111,
+    "cat": "施工-金屬",
+    "type": "single",
+    "q": "塗裝鋼鐵結構物時須先",
+    "o": {
+      "A": "脫脂",
+      "B": "著色",
+      "C": "水洗",
+      "D": "除銹 處理"
+    },
+    "a": [
+      "D"
+    ],
+    "hint": "",
+    "src": "111年學科試題"
+  },
+  {
+    "id": "111-q019",
+    "year": 111,
+    "cat": "法規-室裝辦法",
+    "type": "single",
+    "q": "依「建築物室內裝修管理辦法」，室內裝修專業技術人員未依審核合格圖說施工者，當地主管機 關查明屬實後，得予以多少期限之停止執行職務處分",
+    "o": {
+      "A": "六個月以上一年以下",
+      "B": "一年以上二年以下",
+      "C": "三個月以上六個月以下",
+      "D": "一個月以上三個月以下"
+    },
+    "a": [
+      "A"
+    ],
+    "hint": "",
+    "src": "111年學科試題"
+  },
+  {
+    "id": "111-q020",
+    "year": 111,
+    "cat": "法規-消防",
+    "type": "single",
+    "q": "滅火設備中之滅火器，於規定場所內，步行距離",
+    "o": {
+      "A": "30 公尺",
+      "B": "10 公尺",
+      "C": "40 公尺",
+      "D": "20 公尺 以內， 必須配置"
+    },
+    "a": [
+      "D"
+    ],
+    "hint": "",
+    "src": "111年學科試題"
+  },
+  {
+    "id": "111-q021",
+    "year": 111,
+    "cat": "法規-建技規",
+    "type": "single",
+    "q": "依「建築法」規定，建築物之室內裝修材料應合於",
+    "o": {
+      "A": "建築技術規則",
+      "B": "電業法",
+      "C": "消防法",
+      "D": "營造業法 之規定"
+    },
+    "a": [
+      "A"
+    ],
+    "hint": "",
+    "src": "111年學科試題"
+  },
+  {
+    "id": "111-q022",
+    "year": 111,
+    "cat": "法規-室裝辦法",
+    "type": "single",
+    "q": "竣工查驗檢附的室內裝修材料書中的裝修數量應與何者一致",
+    "o": {
+      "A": "廠商名稱",
+      "B": "材料名稱",
+      "C": "耐燃等級",
+      "D": "出貨證明"
+    },
+    "a": [
+      "D"
+    ],
+    "hint": "",
+    "src": "111年學科試題"
+  },
+  {
+    "id": "111-q023",
+    "year": 111,
+    "cat": "共同-節能",
+    "type": "single",
+    "q": "下列何者為節能標章？",
+    "o": {
+      "A": "",
+      "B": "",
+      "C": "",
+      "D": ""
+    },
+    "a": [
+      "C"
+    ],
+    "hint": "",
+    "src": "111年學科試題"
+  },
+  {
+    "id": "111-q024",
+    "year": 111,
+    "cat": "共同-節能",
+    "type": "single",
+    "q": "政府為推廣節能設備而補助民眾汰換老舊設備，下列何者的節電效益最佳？",
+    "o": {
+      "A": "汰換電風扇，改裝 設能源效率標示分級為一級的冷氣機",
+      "B": "將桌上檯燈光源由螢光燈換為LED 燈",
+      "C": "優先淘汰10 年以 上的老舊冷氣機為能源效率標示分級中之一級冷氣機",
+      "D": "因為經費有限，選擇便宜的產品比較重 要"
+    },
+    "a": [
+      "C"
+    ],
+    "hint": "",
+    "src": "111年學科試題"
+  },
+  {
+    "id": "111-q025",
+    "year": 111,
+    "cat": "管理-估算",
+    "type": "single",
+    "q": "室內裝修工程中，如作業施工場所高度差超過",
+    "o": {
+      "A": "2.5",
+      "B": "2",
+      "C": "1.5",
+      "D": "1 公尺以上時，應設置能使勞工 安全上下之設備"
+    },
+    "a": [
+      "C"
+    ],
+    "hint": "",
+    "src": "111年學科試題"
+  },
+  {
+    "id": "111-q026",
+    "year": 111,
+    "cat": "施工-水電",
+    "type": "single",
+    "q": "依中華民國國家標準CNS 規定，在電氣設備圖中 此符號代表配電系統之",
+    "o": {
+      "A": "電力總配電盤",
+      "B": "電燈分電盤",
+      "C": "電力分電盤",
+      "D": "電燈總配電盤"
+    },
+    "a": [
+      "B"
+    ],
+    "hint": "",
+    "src": "111年學科試題"
+  },
+  {
+    "id": "111-q027",
+    "year": 111,
+    "cat": "施工-泥作",
+    "type": "single",
+    "q": "乳膠漆塗佈於水泥粉刷牆面時，除需以批土填平毛孔外，至少均塗",
+    "o": {
+      "A": "五層",
+      "B": "三層",
+      "C": "四層",
+      "D": "二層"
+    },
+    "a": [
+      "B"
+    ],
+    "hint": "",
+    "src": "111年學科試題"
+  },
+  {
+    "id": "111-q028",
+    "year": 111,
+    "cat": "共同-節能",
+    "type": "single",
+    "q": "於營造工地潮濕場所中使用電動機具，為防止漏電危害，應於該電路設置何種安全裝置？",
+    "o": {
+      "A": "自動 電擊防止裝置",
+      "B": "閉關箱",
+      "C": "高容量保險絲",
+      "D": "高感度高速型漏電斷路器"
+    },
+    "a": [
+      "D"
+    ],
+    "hint": "",
+    "src": "111年學科試題"
+  },
+  {
+    "id": "111-q029",
+    "year": 111,
+    "cat": "待分類",
+    "type": "single",
+    "q": "下列關於強化玻璃的敘述那一項是錯誤",
+    "o": {
+      "A": "需經空氣迅速冷卻處理",
+      "B": "由平板玻璃經熱處理而成",
+      "C": "強 化後可依需要尺寸再裁切",
+      "D": "其產生的均等的壓縮應力可抵銷外壓的張應力而維繫安全"
+    },
+    "a": [
+      "C"
+    ],
+    "hint": "",
+    "src": "111年學科試題"
+  },
+  {
+    "id": "111-q030",
+    "year": 111,
+    "cat": "施工-輕隔間",
+    "type": "single",
+    "q": "輕隔間牆工程最常採用何種方法固定上下座板（槽鐵）？",
+    "o": {
+      "A": "自攻螺絲",
+      "B": "強力膠",
+      "C": "火藥擊釘",
+      "D": "鐵 釘"
+    },
+    "a": [
+      "C"
+    ],
+    "hint": "",
+    "src": "111年學科試題"
+  },
+  {
+    "id": "111-q031",
+    "year": 111,
+    "cat": "施工-水電",
+    "type": "single",
+    "q": "管徑100 公厘以下之排水橫管，清潔口間距不得超過",
+    "o": {
+      "A": "15",
+      "B": "20",
+      "C": "30",
+      "D": "25 公尺"
+    },
+    "a": [
+      "A"
+    ],
+    "hint": "",
+    "src": "111年學科試題"
+  },
+  {
+    "id": "111-q032",
+    "year": 111,
+    "cat": "待分類",
+    "type": "single",
+    "q": "下列哪種板材厚度最厚？",
+    "o": {
+      "A": "1.5 公分人造檯面",
+      "B": "6 分大理石",
+      "C": "10 ㎜玻璃",
+      "D": "1/2 寸實木面板"
+    },
+    "a": [
+      "B"
+    ],
+    "hint": "",
+    "src": "111年學科試題"
+  },
+  {
+    "id": "111-q033",
+    "year": 111,
+    "cat": "施工-金屬",
+    "type": "single",
+    "q": "金屬輕鋼架施工一般長型平面房間天花主吊架方向應採用何向為宜？",
+    "o": {
+      "A": "長向、短向均可",
+      "B": "短向",
+      "C": "長向",
+      "D": "不須主吊架"
+    },
+    "a": [
+      "B"
+    ],
+    "hint": "",
+    "src": "111年學科試題"
+  },
+  {
+    "id": "111-q034",
+    "year": 111,
+    "cat": "待分類",
+    "type": "single",
+    "q": "下列哪一項是我們在家中常見的環境衛生用藥？",
+    "o": {
+      "A": "洗滌劑",
+      "B": "殺蟲劑",
+      "C": "體香劑",
+      "D": "乾燥劑"
+    },
+    "a": [
+      "B"
+    ],
+    "hint": "",
+    "src": "111年學科試題"
+  },
+  {
+    "id": "111-q035",
+    "year": 111,
+    "cat": "圖說判讀",
+    "type": "single",
+    "q": "在比例尺1/50 的圖面上，施工人員以捲尺量得長度為10 公分的牆面，實際代表長度為",
+    "o": {
+      "A": "5 公尺",
+      "B": "10 公尺",
+      "C": "15 公尺",
+      "D": "20 公尺"
+    },
+    "a": [
+      "A"
+    ],
+    "hint": "",
+    "src": "111年學科試題"
+  },
+  {
+    "id": "111-q036",
+    "year": 111,
+    "cat": "共同-工倫",
+    "type": "single",
+    "q": "下列何者行為非屬個人資料保護法所稱之國際傳輸？",
+    "o": {
+      "A": "將個人資料傳送給日本的委託公司",
+      "B": "將個 人資料傳送給美國的分公司",
+      "C": "將個人資料傳送給經濟部",
+      "D": "將個人資料傳送給法國的人事部門"
+    },
+    "a": [
+      "C"
+    ],
+    "hint": "",
+    "src": "111年學科試題"
+  },
+  {
+    "id": "111-q037",
+    "year": 111,
+    "cat": "共同-工倫",
+    "type": "single",
+    "q": "根據消除對婦女一切形式歧視公約(CEDAW)之間接歧視意涵，下列何者錯誤？",
+    "o": {
+      "A": "如果未正視歧視 之結構和歷史模式，及忽略男女權力關係之不平等，可能使現有不平等狀況更為惡化",
+      "B": "不論在任 何情況下，只要以相同方式對待男性和女性，就能避免間接歧視之產生",
+      "C": "一項法律、政策、方案 或措施表面上對男性和女性無任何歧視，但實際上卻產生歧視女性的效果",
+      "D": "察覺間接歧視的一個 方法，是善加利用性別統計與性別分析"
+    },
+    "a": [
+      "B"
+    ],
+    "hint": "",
+    "src": "111年學科試題"
+  },
+  {
+    "id": "111-q038",
+    "year": 111,
+    "cat": "法規-職安",
+    "type": "single",
+    "q": "從事於易踏穿材料構築之屋頂修繕作業時，應有何種作業主管在場執行主管業務？",
+    "o": {
+      "A": "施工架組配",
+      "B": "模板支撐",
+      "C": "擋土支撐組配",
+      "D": "屋頂"
+    },
+    "a": [
+      "D"
+    ],
+    "hint": "",
+    "src": "111年學科試題"
+  },
+  {
+    "id": "111-q039",
+    "year": 111,
+    "cat": "施工-泥作",
+    "type": "single",
+    "q": "室內裝修施工中較常遭遇感電災害的工作是",
+    "o": {
+      "A": "貼磁磚",
+      "B": "框架拆除",
+      "C": "電動工具使用",
+      "D": "清理搬運"
+    },
+    "a": [
+      "C"
+    ],
+    "hint": "",
+    "src": "111年學科試題"
+  },
+  {
+    "id": "111-q040",
+    "year": 111,
+    "cat": "共同-節能",
+    "type": "single",
+    "q": "家庭用電最大宗來自於",
+    "o": {
+      "A": "空調及照明",
+      "B": "電視",
+      "C": "吹風機",
+      "D": "電腦"
+    },
+    "a": [
+      "A"
+    ],
+    "hint": "",
+    "src": "111年學科試題"
+  },
+  {
+    "id": "111-q041",
+    "year": 111,
+    "cat": "待分類",
+    "type": "single",
+    "q": "木面整理時，下列何者最難清除？",
+    "o": {
+      "A": "手印",
+      "B": "砂痕",
+      "C": "油污",
+      "D": "殘膠"
+    },
+    "a": [
+      "C"
+    ],
+    "hint": "",
+    "src": "111年學科試題"
+  },
+  {
+    "id": "111-q042",
+    "year": 111,
+    "cat": "施工-泥作",
+    "type": "single",
+    "q": "室內裝修施工中較常遭遇物體飛落災害的工作是",
+    "o": {
+      "A": "貼磁磚",
+      "B": "供電設備斷絕",
+      "C": "供水設備斷絕",
+      "D": "貼壁 紙"
+    },
+    "a": [
+      "A"
+    ],
+    "hint": "",
+    "src": "111年學科試題"
+  },
+  {
+    "id": "111-q043",
+    "year": 111,
+    "cat": "待分類",
+    "type": "single",
+    "q": "水中生化需氧量(BOD)愈高，其所代表的意義為下列何者？",
+    "o": {
+      "A": "有機污染物多",
+      "B": "水質偏酸",
+      "C": "分解污 染物時不需消耗太多氧",
+      "D": "水為硬水"
+    },
+    "a": [
+      "A"
+    ],
+    "hint": "",
+    "src": "111年學科試題"
+  },
+  {
+    "id": "111-q044",
+    "year": 111,
+    "cat": "施工-塗裝",
+    "type": "single",
+    "q": "室內裝修工程中最不常見的現場塗裝方式是",
+    "o": {
+      "A": "滾塗",
+      "B": "噴塗",
+      "C": "刷塗",
+      "D": "粉體塗裝"
+    },
+    "a": [
+      "D"
+    ],
+    "hint": "",
+    "src": "111年學科試題"
+  },
+  {
+    "id": "111-q045",
+    "year": 111,
+    "cat": "管理-估算",
+    "type": "single",
+    "q": "十平方公尺約為多少坪",
+    "o": {
+      "A": "0.3025",
+      "B": "3.025",
+      "C": "3.3",
+      "D": "4"
+    },
+    "a": [
+      "B"
+    ],
+    "hint": "",
+    "src": "111年學科試題"
+  },
+  {
+    "id": "111-q046",
+    "year": 111,
+    "cat": "施工-水電",
+    "type": "single",
+    "q": "依中華民國國家標準CNS 規定，下圖給排水及衛生設備符號表示為何？",
+    "o": {
+      "A": "給水管",
+      "B": "通氣管",
+      "C": "回水 管",
+      "D": "排水管"
+    },
+    "a": [
+      "B"
+    ],
+    "hint": "",
+    "src": "111年學科試題"
+  },
+  {
+    "id": "111-q047",
+    "year": 111,
+    "cat": "施工-輕隔間",
+    "type": "single",
+    "q": "輕鋼架天花應於施工至",
+    "o": {
+      "A": "放板施工完成後",
+      "B": "燈具、設備安裝完成後",
+      "C": "主架安裝完成後",
+      "D": "所有吊架 施工完成後 調整彈簧片吊筋長度，固定水平"
+    },
+    "a": [
+      "D"
+    ],
+    "hint": "",
+    "src": "111年學科試題"
+  },
+  {
+    "id": "111-q048",
+    "year": 111,
+    "cat": "共同-工倫",
+    "type": "single",
+    "q": "受僱人於職務上所完成之著作，如果沒有特別以契約約定，其著作人為下列何者？",
+    "o": {
+      "A": "由雇用人指 定之自然人或法人",
+      "B": "雇用人",
+      "C": "雇用公司或機關法人代表",
+      "D": "受僱人"
+    },
+    "a": [
+      "D"
+    ],
+    "hint": "",
+    "src": "111年學科試題"
+  },
+  {
+    "id": "111-q049",
+    "year": 111,
+    "cat": "共同-職安",
+    "type": "single",
+    "q": "用電熱爐煮火鍋，採用中溫50%加熱，比用高溫100%加熱，將同一鍋水煮開，下列何者是對 的？",
+    "o": {
+      "A": "兩種方式用電量是一樣的",
+      "B": "中溫50%加熱比較省電",
+      "C": "中溫50%加熱，電流反而比較大",
+      "D": "高 溫100%加熱比較省電"
+    },
+    "a": [
+      "A"
+    ],
+    "hint": "",
+    "src": "111年學科試題"
+  },
+  {
+    "id": "111-q050",
+    "year": 111,
+    "cat": "管理-估算",
+    "type": "single",
+    "q": "使用活動移動梯之作業高度不得超過",
+    "o": {
+      "A": "3 公尺",
+      "B": "4 公尺",
+      "C": "2 公尺",
+      "D": "5 公尺"
+    },
+    "a": [
+      "C"
+    ],
+    "hint": "",
+    "src": "111年學科試題"
+  },
+  {
+    "id": "111-q051",
+    "year": 111,
+    "cat": "施工-輕隔間",
+    "type": "single",
+    "q": "輕隔間牆使用岩綿填充牆體，主要目的在",
+    "o": {
+      "A": "防火",
+      "B": "增加柔軟度",
+      "C": "加強結構",
+      "D": "增加價值感"
+    },
+    "a": [
+      "A"
+    ],
+    "hint": "",
+    "src": "111年學科試題"
+  },
+  {
+    "id": "111-q052",
+    "year": 111,
+    "cat": "法規-室裝辦法",
+    "type": "single",
+    "q": "依「建築物室內裝修管理辦法」規定，從事室內裝修施工業務之室內裝修業者，應置",
+    "o": {
+      "A": "專業工地 管理人員一人以上",
+      "B": "專業施工技術人員一人以上",
+      "C": "專業繪圖人員一人以上",
+      "D": "專業設計技術人員一 人以上"
+    },
+    "a": [
+      "B"
+    ],
+    "hint": "",
+    "src": "111年學科試題"
+  },
+  {
+    "id": "111-q053",
+    "year": 111,
+    "cat": "管理-估算",
+    "type": "single",
+    "q": "依規定，在屋頂內之樓層，且其樓地板面積未達該建築物建築面積三分之一者，稱為",
+    "o": {
+      "A": "閣樓",
+      "B": "屋 頂層",
+      "C": "夾層",
+      "D": "地下層"
+    },
+    "a": [
+      "A"
+    ],
+    "hint": "",
+    "src": "111年學科試題"
+  },
+  {
+    "id": "111-q054",
+    "year": 111,
+    "cat": "施工-木作",
+    "type": "single",
+    "q": "合板是以奇數層之薄木單板經烘乾後，黏著而成，其各層之木板纖維方向是",
+    "o": {
+      "A": "互成45 度",
+      "B": "互不 相干",
+      "C": "互相平行",
+      "D": "互相垂直"
+    },
+    "a": [
+      "D"
+    ],
+    "hint": "",
+    "src": "111年學科試題"
+  },
+  {
+    "id": "111-q055",
+    "year": 111,
+    "cat": "共同-職安",
+    "type": "single",
+    "q": "在噪音防治之對策中，從下列哪一方面著手最為有效？",
+    "o": {
+      "A": "傳播途徑",
+      "B": "偵測儀器",
+      "C": "個人防護具",
+      "D": "噪 音源"
+    },
+    "a": [
+      "D"
+    ],
+    "hint": "",
+    "src": "111年學科試題"
+  },
+  {
+    "id": "111-q056",
+    "year": 111,
+    "cat": "施工-泥作",
+    "type": "single",
+    "q": "砌磚工作程序下列敘述何者正確？",
+    "o": {
+      "A": "摔漿→撥漿→刮漿→砌頭",
+      "B": "摔漿→刮漿→撥漿→砌頭",
+      "C": "刮漿 →砌頭→摔漿→撥漿",
+      "D": "撥漿→摔漿→刮漿→砌頭"
+    },
+    "a": [
+      "A"
+    ],
+    "hint": "",
+    "src": "111年學科試題"
+  },
+  {
+    "id": "111-q057",
+    "year": 111,
+    "cat": "施工-金屬",
+    "type": "single",
+    "q": "常用低壓屋內配線以採用下列何種導線為宜？",
+    "o": {
+      "A": "絕緣硬銅線",
+      "B": "鐵線",
+      "C": "絕緣軟銅線",
+      "D": "鋼心鋁線"
+    },
+    "a": [
+      "C"
+    ],
+    "hint": "",
+    "src": "111年學科試題"
+  },
+  {
+    "id": "111-q058",
+    "year": 111,
+    "cat": "法規-建技規",
+    "type": "single",
+    "q": "依「建築技術規則」規定，耐火板係指：木絲水泥板、耐燃石膏板及其他經中央主管建築機關認 定符合",
+    "o": {
+      "A": "耐燃一級",
+      "B": "耐燃二級",
+      "C": "耐燃四級",
+      "D": "耐燃三級 之材料"
+    },
+    "a": [
+      "B"
+    ],
+    "hint": "",
+    "src": "111年學科試題"
+  },
+  {
+    "id": "111-q059",
+    "year": 111,
+    "cat": "丈量放樣",
+    "type": "single",
+    "q": "墨斗放樣工作先後次序",
+    "o": {
+      "A": "註記→定點→引線→彈線",
+      "B": "定點→引線→彈線→註記",
+      "C": "定點→註記→引 線→彈線",
+      "D": "彈線→定點→引線→註記"
+    },
+    "a": [
+      "B"
+    ],
+    "hint": "",
+    "src": "111年學科試題"
+  },
+  {
+    "id": "111-q060",
+    "year": 111,
+    "cat": "施工-水電",
+    "type": "single",
+    "q": "排水管其橫支管及橫主管管徑小於7 5 公厘(含75 公厘)時，其坡度不得小於",
+    "o": {
+      "A": "1/80",
+      "B": "1/75",
+      "C": "1 /100",
+      "D": "1/50"
+    },
+    "a": [
+      "D"
+    ],
+    "hint": "",
+    "src": "111年學科試題"
+  },
+  {
+    "id": "111-q061",
+    "year": 111,
+    "cat": "管理-估算",
+    "type": "multi",
+    "q": "下列面積計算及單位換算何者正確？",
+    "o": {
+      "A": "長12.5 公尺×寬8 公尺＝100 平方公尺約為30.25 坪",
+      "B": "長9 台尺×寬4 台尺＝1 坪",
+      "C": "長8 公尺×寬5 公尺＝40 平方公尺約為12.1 坪",
+      "D": "長18 台尺×寬12 台尺＝ 4 坪"
+    },
+    "a": [
+      "A",
+      "B",
+      "C"
+    ],
+    "hint": "",
+    "src": "111年學科試題"
+  },
+  {
+    "id": "111-q062",
+    "year": 111,
+    "cat": "管理-估算",
+    "type": "multi",
+    "q": "有關室內裝修一般常見的魯班尺上半部為文公尺，下列哪些為用於陽宅、神位、佛具尺寸之吉凶 的度量衡之文字？",
+    "o": {
+      "A": "本",
+      "B": "財",
+      "C": "苦",
+      "D": "離"
+    },
+    "a": [
+      "A",
+      "B",
+      "D"
+    ],
+    "hint": "",
+    "src": "111年學科試題"
+  },
+  {
+    "id": "111-q063",
+    "year": 111,
+    "cat": "共同-職安",
+    "type": "multi",
+    "q": "依職業安全衛生相關法規規定，實施作業環境測定之作業場所，下列哪些是正確？",
+    "o": {
+      "A": "粉塵作業場 所或有機溶劑作業場所經地方主管機關指定者",
+      "B": "顯著發生噪音之作業場所",
+      "C": "粉塵作業場所經中央 主管機關指定者",
+      "D": "有機溶劑作業場所經中央主管機關指定者"
+    },
+    "a": [
+      "B",
+      "C",
+      "D"
+    ],
+    "hint": "",
+    "src": "111年學科試題"
+  },
+  {
+    "id": "111-q064",
+    "year": 111,
+    "cat": "施工-泥作",
+    "type": "multi",
+    "q": "瓷磚剝落之原因有下列哪些？",
+    "o": {
+      "A": "瓷磚品質不良或龜裂，黏著劑強度不足或是黏著與水泥砂漿的界 面的破壞",
+      "B": "瓷磚黏著施工時機妥善掌握",
+      "C": "膠泥塗佈厚度不足或嵌入不足",
+      "D": "瓷磚界面，牆體界面， 瓷磚的伸縮縫未妥善預留"
+    },
+    "a": [
+      "A",
+      "C",
+      "D"
+    ],
+    "hint": "",
+    "src": "111年學科試題"
+  },
+  {
+    "id": "111-q065",
+    "year": 111,
+    "cat": "法規-室裝辦法",
+    "type": "multi",
+    "q": "依建築物室內裝修管理辦法規定；新建建築物於領得使用執照前申請室內裝修許可者，應於領得 下列哪些文件，始得使用？",
+    "o": {
+      "A": "建造執造",
+      "B": "使用執照",
+      "C": "室內裝修許可",
+      "D": "室內裝修合格證明"
+    },
+    "a": [
+      "B",
+      "D"
+    ],
+    "hint": "",
+    "src": "111年學科試題"
+  },
+  {
+    "id": "111-q066",
+    "year": 111,
+    "cat": "施工-木作",
+    "type": "multi",
+    "q": "依機械器具安全防護標準規定，下列何項為正確？",
+    "o": {
+      "A": "圓盤鋸應設置圓盤鋸之正撥預防裝置",
+      "B": "木材 加工用圓盤鋸，使撐縫片與其面對之圓鋸片鋸齒前端之間隙在15 毫米以下",
+      "C": "反撥預防裝置之撐 縫片及鋸齒接觸預防裝置經常使包含其縱斷面之縱向中心線而和其側面平行之面，與包含圓鋸片 縱斷面之縱向中心線而和其側面平行之面，位於同一平面上",
+      "D": "圓盤鋸應設置圓盤鋸之鋸齒接觸預 防裝置"
+    },
+    "a": [
+      "C",
+      "D"
+    ],
+    "hint": "",
+    "src": "111年學科試題"
+  },
+  {
+    "id": "111-q067",
+    "year": 111,
+    "cat": "共同-職安",
+    "type": "multi",
+    "q": "依職業安全衛生設施規則規定，雇主對於室內工作場所，應依規定設置足夠勞工使用之通道，下 列哪些為不正確？",
+    "o": {
+      "A": "應有適應其用途之寬度，其主要人行道不得小於0.9 公尺",
+      "B": "各機械間或其他 設備間通道不得小於60 公分",
+      "C": "主要人行道及有關安全門、安全梯應有明顯標示",
+      "D": "自路面起算1.5 公尺高度之範圍內，不得有障礙物但因工作之必要，經採防護措施者，不在此限"
+    },
+    "a": [
+      "A",
+      "B",
+      "D"
+    ],
+    "hint": "",
+    "src": "111年學科試題"
+  },
+  {
+    "id": "111-q068",
+    "year": 111,
+    "cat": "共同-職安",
+    "type": "multi",
+    "q": "依職業安全衛生設施規則規定，雇主不得以下列何種情況之吊鏈作為起重升降機具之吊掛用具及 構件",
+    "o": {
+      "A": "有龜裂者",
+      "B": "延伸長度超過百分之五以上者",
+      "C": "斷面直徑減少百分之十以上者",
+      "D": "吊鉤或鉤環及 附屬零件，其斷裂荷重與所承受之最大荷重比之安全係數，應在四以上"
+    },
+    "a": [
+      "A",
+      "B",
+      "C"
+    ],
+    "hint": "",
+    "src": "111年學科試題"
+  },
+  {
+    "id": "111-q069",
+    "year": 111,
+    "cat": "施工-木作",
+    "type": "multi",
+    "q": "下列哪些為不正確？",
+    "o": {
+      "A": "紋理斜叉者為斜紋",
+      "B": "紋理如木材年輪與寬面鋸成45°以上者，謂之平紋",
+      "C": "紋理平行於其邊者，稱為直紋",
+      "D": "凡樹木生長迅速者，其生長環必緊，稱為密紋；反之，生長緩慢 者則環必寬，稱為粗紋"
+    },
+    "a": [
+      "B",
+      "D"
+    ],
+    "hint": "",
+    "src": "111年學科試題"
+  },
+  {
+    "id": "111-q070",
+    "year": 111,
+    "cat": "圖說判讀",
+    "type": "multi",
+    "q": "依據CNS11567-A1042 建築製圖規定，下列哪些為「平面詳圖」之比例尺原則？",
+    "o": {
+      "A": "1/10",
+      "B": "1/5",
+      "C": "1 / 30",
+      "D": "1/60"
+    },
+    "a": [
+      "A",
+      "B",
+      "C"
+    ],
+    "hint": "",
+    "src": "111年學科試題"
+  },
+  {
+    "id": "111-q071",
+    "year": 111,
+    "cat": "共同-職安",
+    "type": "multi",
+    "q": "依營造安全衛生設施標準規定，施工中對於施工場所材料之堆放，應置放於穩固、平坦之處，整 齊緊靠堆置及下列哪些為正確？",
+    "o": {
+      "A": "材料儲存位置鄰近開口部分時，應距離該開口部分1.8 公尺",
+      "B": "磚堆置高度不得超過1.8 公尺",
+      "C": "瓦堆置高度不得超過2 公尺",
+      "D": "管料之置放，避免在電線上方或下 方"
+    },
+    "a": [
+      "B",
+      "D"
+    ],
+    "hint": "",
+    "src": "111年學科試題"
+  },
+  {
+    "id": "111-q072",
+    "year": 111,
+    "cat": "施工-塗裝",
+    "type": "multi",
+    "q": "以下是塗裝適用性之條件的敘述，何者正確？",
+    "o": {
+      "A": "好管理是指應施於充分的塗裝作業管理",
+      "B": "好塗料 是指半成品的塗料品質必須良好，具備各性能皆優秀之塗料",
+      "C": "好價格一定能達到圓滿的塗裝結果",
+      "D": "好設計是指應選擇能配合塗料及被塗物之適當塗裝系"
+    },
+    "a": [
+      "A",
+      "B",
+      "D"
+    ],
+    "hint": "",
+    "src": "111年學科試題"
+  },
+  {
+    "id": "111-q073",
+    "year": 111,
+    "cat": "法規-建技規",
+    "type": "multi",
+    "q": "依建築技術規則，凡裝設於舞臺之電氣設備，哪些是正確",
+    "o": {
+      "A": "更衣室內之燈具應使用吊管或鏈吊型",
+      "B": "舞臺燈之分路，每路最大負荷不得超過2 0 安培",
+      "C": "燈具離樓地板面高度低於二點五公尺者，應 加裝燈具護罩",
+      "D": "對地電壓應為220 伏特以下"
+    },
+    "a": [
+      "B",
+      "C"
+    ],
+    "hint": "",
+    "src": "111年學科試題"
+  },
+  {
+    "id": "111-q074",
+    "year": 111,
+    "cat": "圖說判讀",
+    "type": "multi",
+    "q": "依CNS11567 之A1042 建築圖符號及圖例規定，下列哪些屬於材料、構造圖例？",
+    "o": {
+      "A": "",
+      "B": "",
+      "C": "",
+      "D": ""
+    },
+    "a": [
+      "A",
+      "B",
+      "D"
+    ],
+    "hint": "",
+    "src": "111年學科試題"
+  },
+  {
+    "id": "111-q075",
+    "year": 111,
+    "cat": "施工-木作",
+    "type": "multi",
+    "q": "下列何者為裝修工程中木作之接合方式？",
+    "o": {
+      "A": "木螺絲釘接合",
+      "B": "鐵釘接合",
+      "C": "焊接",
+      "D": "榫接合"
+    },
+    "a": [
+      "A",
+      "B",
+      "D"
+    ],
+    "hint": "",
+    "src": "111年學科試題"
+  },
+  {
+    "id": "111-q076",
+    "year": 111,
+    "cat": "丈量放樣",
+    "type": "multi",
+    "q": "下列哪些為可直接量測水平的工具？",
+    "o": {
+      "A": "錘球",
+      "B": "氣泡式水準尺",
+      "C": "雷射水準儀",
+      "D": "墨斗"
+    },
+    "a": [
+      "B",
+      "C"
+    ],
+    "hint": "",
+    "src": "111年學科試題"
+  },
+  {
+    "id": "111-q077",
+    "year": 111,
+    "cat": "待分類",
+    "type": "multi",
+    "q": "面磚之優點有下列哪些？",
+    "o": {
+      "A": "穩定性高不變形，不褪色及伸縮率低",
+      "B": "耐候力強，不老化，耐水，耐 火，耐磨及耐高壓",
+      "C": "硬度高耐蝕，耐酸及耐鹽",
+      "D": "成品之色彩，容易變色"
+    },
+    "a": [
+      "A",
+      "B",
+      "C"
+    ],
+    "hint": "",
+    "src": "111年學科試題"
+  },
+  {
+    "id": "111-q078",
+    "year": 111,
+    "cat": "待分類",
+    "type": "multi",
+    "q": "玻璃安裝用黏劑成份之彈性材料，凝結後應具有下列何特性？",
+    "o": {
+      "A": "抗壓性",
+      "B": "復原性",
+      "C": "伸展性",
+      "D": "防剝 落力"
+    },
+    "a": [
+      "B",
+      "C",
+      "D"
+    ],
+    "hint": "",
+    "src": "111年學科試題"
+  },
+  {
+    "id": "111-q079",
+    "year": 111,
+    "cat": "待分類",
+    "type": "multi",
+    "q": "室內裝修專業技術人員有下列哪些情事者，將註銷其登記證？",
+    "o": {
+      "A": "受停止換發登記證處分累計二次",
+      "B": "受停止換發登記證處分累計三次",
+      "C": "五年內受停止執行職務處分累計滿一年",
+      "D": "十年內受停止執行 職務處分累計滿二年"
+    },
+    "a": [
+      "B",
+      "D"
+    ],
+    "hint": "",
+    "src": "111年學科試題"
+  },
+  {
+    "id": "111-q080",
+    "year": 111,
+    "cat": "待分類",
+    "type": "multi",
+    "q": "玻璃質絕熱、隔音材料主要有",
+    "o": {
+      "A": "玻璃棉毯",
+      "B": "泡沫玻璃",
+      "C": "玻璃纖維",
+      "D": "玻璃馬賽克"
+    },
+    "a": [
+      "A",
+      "B",
+      "C"
+    ],
+    "hint": "",
+    "src": "111年學科試題"
+  },
+  {
+    "id": "112-q001",
+    "year": 112,
+    "cat": "管理-進度",
+    "type": "single",
+    "q": "記載建築物室內裝修工程日報表，以下何者敘述非為主要項目？",
+    "o": {
+      "A": "工程進度",
+      "B": "重要施工項目完 成數量之計算金額",
+      "C": "重要事項紀錄",
+      "D": "施工取樣試驗"
+    },
+    "a": [
+      "B"
+    ],
+    "hint": "",
+    "src": "112年學科試題"
+  },
+  {
+    "id": "112-q002",
+    "year": 112,
+    "cat": "法規-建技規",
+    "type": "single",
+    "q": "分隔建築物內部空間之牆壁稱為",
+    "o": {
+      "A": "分間牆",
+      "B": "分戶牆",
+      "C": "分界牆",
+      "D": "分室牆"
+    },
+    "a": [
+      "A"
+    ],
+    "hint": "",
+    "src": "112年學科試題"
+  },
+  {
+    "id": "112-q003",
+    "year": 112,
+    "cat": "法規-室裝辦法",
+    "type": "single",
+    "q": "開業建築師所簽證符合規定之替代現況圖之比例尺不得小於",
+    "o": {
+      "A": "五十分之一",
+      "B": "二百分之一",
+      "C": "五百 分之一",
+      "D": "一百分之一"
+    },
+    "a": [
+      "B"
+    ],
+    "hint": "",
+    "src": "112年學科試題"
+  },
+  {
+    "id": "112-q004",
+    "year": 112,
+    "cat": "施工-泥作",
+    "type": "single",
+    "q": "泥工工具中之磚鑿是用來",
+    "o": {
+      "A": "砌磚",
+      "B": "粉刷",
+      "C": "刮縫",
+      "D": "切磚"
+    },
+    "a": [
+      "D"
+    ],
+    "hint": "",
+    "src": "112年學科試題"
+  },
+  {
+    "id": "112-q005",
+    "year": 112,
+    "cat": "管理-估算",
+    "type": "single",
+    "q": "窗簾布料常用計算單位為",
+    "o": {
+      "A": "立方才",
+      "B": "尺或碼",
+      "C": "坪",
+      "D": "公尺"
+    },
+    "a": [
+      "B"
+    ],
+    "hint": "",
+    "src": "112年學科試題"
+  },
+  {
+    "id": "112-q006",
+    "year": 112,
+    "cat": "施工-金屬",
+    "type": "single",
+    "q": "塗裝鋼鐵結構物時須先",
+    "o": {
+      "A": "水洗",
+      "B": "著色",
+      "C": "脫脂",
+      "D": "除銹 處理"
+    },
+    "a": [
+      "D"
+    ],
+    "hint": "",
+    "src": "112年學科試題"
+  },
+  {
+    "id": "112-q007",
+    "year": 112,
+    "cat": "施工-輕隔間",
+    "type": "single",
+    "q": "勞工於礦纖板、石膏板等材料構築之夾層天花板從事作業，為防止勞工踏穿墜落，規劃安全通道 時，於天花板支架上架設適當強度且寬度在多少公分以上之踏板？",
+    "o": {
+      "A": "30",
+      "B": "10",
+      "C": "40",
+      "D": "20"
+    },
+    "a": [
+      "A"
+    ],
+    "hint": "",
+    "src": "112年學科試題"
+  },
+  {
+    "id": "112-q008",
+    "year": 112,
+    "cat": "施工-塗裝",
+    "type": "single",
+    "q": "噴塗時塗膜產生垂流現象的主要原因為",
+    "o": {
+      "A": "空氣濕度過高",
+      "B": "噴嘴壓力不足",
+      "C": "塗料黏度過高",
+      "D": "一次 噴塗過厚"
+    },
+    "a": [
+      "D"
+    ],
+    "hint": "",
+    "src": "112年學科試題"
+  },
+  {
+    "id": "112-q009",
+    "year": 112,
+    "cat": "施工-水電",
+    "type": "single",
+    "q": "下列何者不屬於安全使用手工具的原則",
+    "o": {
+      "A": "開關不可裝置於接地線上",
+      "B": "選擇適合工作所需之手工 具",
+      "C": "選擇良好的材質",
+      "D": "工作前應配戴適當的防護設備"
+    },
+    "a": [
+      "A"
+    ],
+    "hint": "",
+    "src": "112年學科試題"
+  },
+  {
+    "id": "112-q010",
+    "year": 112,
+    "cat": "共同-工倫",
+    "type": "single",
+    "q": "根據消除對婦女一切形式歧視公約(CEDAW)，下列何者正確？",
+    "o": {
+      "A": "傳統習俗應予保護及傳承，即 使含有歧視女性的部分，也不可以改變",
+      "B": "只關心女性在政治方面的人權和基本自由",
+      "C": "未要求政 府需消除個人或企業對女性的歧視",
+      "D": "對婦女的歧視指基於性別而作的任何區別、排斥或限制"
+    },
+    "a": [
+      "D"
+    ],
+    "hint": "",
+    "src": "112年學科試題"
+  },
+  {
+    "id": "112-q011",
+    "year": 112,
+    "cat": "施工-金屬",
+    "type": "single",
+    "q": "以圓形或是扁平行的木片或竹片，以繩編織紋理而成的窗簾稱為",
+    "o": {
+      "A": "布質百折簾",
+      "B": "金屬捲簾",
+      "C": "木 質簾",
+      "D": "塑膠垂直簾"
+    },
+    "a": [
+      "C"
+    ],
+    "hint": "",
+    "src": "112年學科試題"
+  },
+  {
+    "id": "112-q012",
+    "year": 112,
+    "cat": "法規-建技規",
+    "type": "single",
+    "q": "「建築法」所稱建築執照不包含下列何者？",
+    "o": {
+      "A": "雜項執照",
+      "B": "建造執照",
+      "C": "開工執照",
+      "D": "使用執照"
+    },
+    "a": [
+      "C"
+    ],
+    "hint": "",
+    "src": "112年學科試題"
+  },
+  {
+    "id": "112-q013",
+    "year": 112,
+    "cat": "施工-水電",
+    "type": "single",
+    "q": "依中華民國國家標準CNS 規定，電氣設備圖中， 代表",
+    "o": {
+      "A": "吸頂燈",
+      "B": "壁式白熾燈",
+      "C": "吊燈",
+      "D": "電風扇"
+    },
+    "a": [
+      "B"
+    ],
+    "hint": "",
+    "src": "112年學科試題"
+  },
+  {
+    "id": "112-q014",
+    "year": 112,
+    "cat": "法規-消防",
+    "type": "single",
+    "q": "依中華民國國家標準CNS 規定，在設備圖說標準圖例中，下圖符號表示為何？",
+    "o": {
+      "A": "自動灑水管",
+      "B": "火警警報管",
+      "C": "廣播系統管",
+      "D": "消防水管 系統"
+    },
+    "a": [
+      "D"
+    ],
+    "hint": "",
+    "src": "112年學科試題"
+  },
+  {
+    "id": "112-q015",
+    "year": 112,
+    "cat": "法規-室裝辦法",
+    "type": "single",
+    "q": "建築物室內裝修之分間牆位罝變更增加或減少應經",
+    "o": {
+      "A": "專業施工技術人員",
+      "B": "建築師",
+      "C": "專業設計技 術人員",
+      "D": "開業建築師 之簽證負責"
+    },
+    "a": [
+      "D"
+    ],
+    "hint": "",
+    "src": "112年學科試題"
+  },
+  {
+    "id": "112-q016",
+    "year": 112,
+    "cat": "共同-環保",
+    "type": "single",
+    "q": "下列何種方式有助於節省洗衣機的用水量？",
+    "o": {
+      "A": "無需將衣物適當分類",
+      "B": "洗濯衣物時盡量選擇高水 位才洗的乾淨",
+      "C": "洗衣機洗滌的衣物盡量裝滿，一次洗完",
+      "D": "購買洗衣機時選購有省水標章的洗衣 機，可有效節約用水"
+    },
+    "a": [
+      "D"
+    ],
+    "hint": "",
+    "src": "112年學科試題"
+  },
+  {
+    "id": "112-q017",
+    "year": 112,
+    "cat": "共同-節能",
+    "type": "single",
+    "q": "上班性質的商辦大樓為了降低尖峰時段用電，下列何者錯誤？",
+    "o": {
+      "A": "汰換老舊電梯馬達並使用變頻控 制",
+      "B": "使用儲冰式空調系統減少白天空調電能需求",
+      "C": "白天有陽光照明，所以白天可以將照明設備 全關掉",
+      "D": "電梯設定隔層停止控制，減少頻繁啟動"
+    },
+    "a": [
+      "C"
+    ],
+    "hint": "",
+    "src": "112年學科試題"
+  },
+  {
+    "id": "112-q018",
+    "year": 112,
+    "cat": "施工-木作",
+    "type": "single",
+    "q": "木材1 才約為多少立方台寸",
+    "o": {
+      "A": "100",
+      "B": "1000",
+      "C": "33",
+      "D": "36"
+    },
+    "a": [
+      "A"
+    ],
+    "hint": "",
+    "src": "112年學科試題"
+  },
+  {
+    "id": "112-q019",
+    "year": 112,
+    "cat": "施工-塗裝",
+    "type": "single",
+    "q": "下列何者「不是」室內空氣污染源？",
+    "o": {
+      "A": "辦公室事務機",
+      "B": "廢紙回收箱",
+      "C": "油漆及塗料",
+      "D": "建材"
+    },
+    "a": [
+      "B"
+    ],
+    "hint": "",
+    "src": "112年學科試題"
+  },
+  {
+    "id": "112-q020",
+    "year": 112,
+    "cat": "施工-金屬",
+    "type": "single",
+    "q": "下列那種不是鋼筋續接的好方法？",
+    "o": {
+      "A": "搭接",
+      "B": "勾接",
+      "C": "瓦斯壓接",
+      "D": "套管式續接"
+    },
+    "a": [
+      "B"
+    ],
+    "hint": "",
+    "src": "112年學科試題"
+  },
+  {
+    "id": "112-q021",
+    "year": 112,
+    "cat": "丈量放樣",
+    "type": "single",
+    "q": "下列何者非屬放樣使用之工具？",
+    "o": {
+      "A": "刮尺",
+      "B": "墨斗",
+      "C": "垂球",
+      "D": "水準器"
+    },
+    "a": [
+      "A"
+    ],
+    "hint": "",
+    "src": "112年學科試題"
+  },
+  {
+    "id": "112-q022",
+    "year": 112,
+    "cat": "共同-工倫",
+    "type": "single",
+    "q": "受僱人於職務上所完成之著作，如果沒有特別以契約約定，其著作人為下列何者？",
+    "o": {
+      "A": "雇用人",
+      "B": "雇用公司或機關法人代表",
+      "C": "由雇用人指定之自然人或法人",
+      "D": "受僱人"
+    },
+    "a": [
+      "D"
+    ],
+    "hint": "",
+    "src": "112年學科試題"
+  },
+  {
+    "id": "112-q023",
+    "year": 112,
+    "cat": "共同-職安",
+    "type": "single",
+    "q": "防止噪音危害之治本對策為",
+    "o": {
+      "A": "消除發生源",
+      "B": "實施職業安全衛生教育訓練",
+      "C": "使用耳塞、耳罩",
+      "D": "實 施特殊健康檢查"
+    },
+    "a": [
+      "A"
+    ],
+    "hint": "",
+    "src": "112年學科試題"
+  },
+  {
+    "id": "112-q024",
+    "year": 112,
+    "cat": "待分類",
+    "type": "single",
+    "q": "油質樹脂漆又稱",
+    "o": {
+      "A": "泡立水",
+      "B": "塑膠漆",
+      "C": "凡立水",
+      "D": "洋乾漆 ，係由合成樹脂、油料、溶劑、催乾劑 等配合而成"
+    },
+    "a": [
+      "C"
+    ],
+    "hint": "",
+    "src": "112年學科試題"
+  },
+  {
+    "id": "112-q025",
+    "year": 112,
+    "cat": "法規-室裝辦法",
+    "type": "single",
+    "q": "依「建築物室內裝修管理辦法」之規定，申請竣工查驗時，下列何種圖說文件不必檢附？",
+    "o": {
+      "A": "申請 書、室內裝修竣工圖",
+      "B": "原領室內裝修審核合格文件",
+      "C": "建築物建照執照",
+      "D": "其他經內政部指定之文 件"
+    },
+    "a": [
+      "C"
+    ],
+    "hint": "",
+    "src": "112年學科試題"
+  },
+  {
+    "id": "112-q026",
+    "year": 112,
+    "cat": "待分類",
+    "type": "single",
+    "q": "下列何種玻璃可於現場施工時裁切、磨修",
+    "o": {
+      "A": "平板玻璃",
+      "B": "熱硬化玻璃",
+      "C": "複層玻璃",
+      "D": "強化玻璃"
+    },
+    "a": [
+      "A"
+    ],
+    "hint": "",
+    "src": "112年學科試題"
+  },
+  {
+    "id": "112-q027",
+    "year": 112,
+    "cat": "待分類",
+    "type": "single",
+    "q": "「勞工於職場上遭受主管或同事利用職務或地位上的優勢予以不當之對待，及遭受顧客、服務對 象或其他相關人士之肢體攻擊、言語侮辱、恐嚇、威脅等霸凌或暴力事件，致發生精神或身體上 的傷害」此等危害可歸類於下列何種職業危害？",
+    "o": {
+      "A": "生物性",
+      "B": "化學性",
+      "C": "物理性",
+      "D": "社會心理性"
+    },
+    "a": [
+      "D"
+    ],
+    "hint": "",
+    "src": "112年學科試題"
+  },
+  {
+    "id": "112-q028",
+    "year": 112,
+    "cat": "施工-泥作",
+    "type": "single",
+    "q": "下列那些步驟非木器、櫥櫃家具烤漆的必要步驟？",
+    "o": {
+      "A": "補土批土",
+      "B": "用火烤",
+      "C": "噴面漆",
+      "D": "噴底漆"
+    },
+    "a": [
+      "B"
+    ],
+    "hint": "",
+    "src": "112年學科試題"
+  },
+  {
+    "id": "112-q029",
+    "year": 112,
+    "cat": "丈量放樣",
+    "type": "single",
+    "q": "測量上所稱距離，係指兩點間之",
+    "o": {
+      "A": "垂直距離",
+      "B": "斜線距離",
+      "C": "水平直線距離",
+      "D": "高低距離"
+    },
+    "a": [
+      "C"
+    ],
+    "hint": "",
+    "src": "112年學科試題"
+  },
+  {
+    "id": "112-q030",
+    "year": 112,
+    "cat": "共同-工倫",
+    "type": "single",
+    "q": "行為人以竊取等不正當方法取得營業秘密，下列敘述何者正確？",
+    "o": {
+      "A": "只要後續沒有出現使用之行為 便不構成犯罪",
+      "B": "只要後續沒有造成所有人之損害便不構成犯罪",
+      "C": "只要後續沒有洩漏便不構成犯 罪",
+      "D": "已構成犯罪"
+    },
+    "a": [
+      "D"
+    ],
+    "hint": "",
+    "src": "112年學科試題"
+  },
+  {
+    "id": "112-q031",
+    "year": 112,
+    "cat": "共同-環保",
+    "type": "single",
+    "q": "下列何者是海洋受污染的現象？",
+    "o": {
+      "A": "形成紅潮",
+      "B": "溫室效應",
+      "C": "形成黑潮",
+      "D": "臭氧層破洞"
+    },
+    "a": [
+      "A"
+    ],
+    "hint": "",
+    "src": "112年學科試題"
+  },
+  {
+    "id": "112-q032",
+    "year": 112,
+    "cat": "施工-金屬",
+    "type": "single",
+    "q": "電源插座堆積灰塵可能引起電氣意外火災，維護保養時的正確做法是？",
+    "o": {
+      "A": "可以用金屬接點清潔劑 噴在插座中去除銹蝕",
+      "B": "可以先用刷子刷去積塵",
+      "C": "應先關閉電源總開關箱內控制該插座的分路開 關",
+      "D": "直接用吹風機吹開灰塵就可以了"
+    },
+    "a": [
+      "C"
+    ],
+    "hint": "",
+    "src": "112年學科試題"
+  },
+  {
+    "id": "112-q033",
+    "year": 112,
+    "cat": "管理-估算",
+    "type": "single",
+    "q": "估價工料，因內容複雜，數字計算繁多，操作過程中為避免錯誤，故常採取",
+    "o": {
+      "A": "複核方式",
+      "B": "單價 分析",
+      "C": "數量計算",
+      "D": "工程統計"
+    },
+    "a": [
+      "A"
+    ],
+    "hint": "",
+    "src": "112年學科試題"
+  },
+  {
+    "id": "112-q034",
+    "year": 112,
+    "cat": "施工-木作",
+    "type": "single",
+    "q": "操作手提式修邊機鉋削材料推進速度應",
+    "o": {
+      "A": "視刀具越銳利越慢",
+      "B": "視材料軟硬與切削深度大小而定",
+      "C": "視加工成本決定快慢",
+      "D": "可快可慢隨心所欲"
+    },
+    "a": [
+      "B"
+    ],
+    "hint": "",
+    "src": "112年學科試題"
+  },
+  {
+    "id": "112-q035",
+    "year": 112,
+    "cat": "共同-環保",
+    "type": "single",
+    "q": "如果水龍頭流量過大，下列何種處理方式是錯誤的？",
+    "o": {
+      "A": "加裝節水墊片或起波器",
+      "B": "直接調整水龍 頭到適當水量",
+      "C": "加裝可自動關閉水龍頭的自動感應器",
+      "D": "直接換裝沒有省水標章的水龍頭"
+    },
+    "a": [
+      "D"
+    ],
+    "hint": "",
+    "src": "112年學科試題"
+  },
+  {
+    "id": "112-q036",
+    "year": 112,
+    "cat": "丈量放樣",
+    "type": "single",
+    "q": "檢查三角形是否為直角，常用三邊的比為",
+    "o": {
+      "A": "1：2：3",
+      "B": "2：3：4",
+      "C": "4：5：6",
+      "D": "3：4：5"
+    },
+    "a": [
+      "D"
+    ],
+    "hint": "",
+    "src": "112年學科試題"
+  },
+  {
+    "id": "112-q037",
+    "year": 112,
+    "cat": "共同-職安",
+    "type": "single",
+    "q": "職業安全衛生法所稱有母性健康危害之虞之工作，不包括下列何種工作型態？",
+    "o": {
+      "A": "人力提舉、搬運 及推拉重物",
+      "B": "長時間站立姿勢作業",
+      "C": "駕駛運輸車輛",
+      "D": "輪班及夜間工作"
+    },
+    "a": [
+      "C"
+    ],
+    "hint": "",
+    "src": "112年學科試題"
+  },
+  {
+    "id": "112-q038",
+    "year": 112,
+    "cat": "施工-塗裝",
+    "type": "single",
+    "q": "塗裝作業常用來作為大面積刷塗之羊毛刷稱為",
+    "o": {
+      "A": "鬃毛刷",
+      "B": "塗裝筆",
+      "C": "水彩筆",
+      "D": "排筆"
+    },
+    "a": [
+      "D"
+    ],
+    "hint": "",
+    "src": "112年學科試題"
+  },
+  {
+    "id": "112-q039",
+    "year": 112,
+    "cat": "共同-環保",
+    "type": "single",
+    "q": "一般人生活產生之廢棄物，何者屬有害廢棄物？",
+    "o": {
+      "A": "廢日光燈管",
+      "B": "廚餘",
+      "C": "鐵鋁罐",
+      "D": "廢玻璃"
+    },
+    "a": [
+      "A"
+    ],
+    "hint": "",
+    "src": "112年學科試題"
+  },
+  {
+    "id": "112-q040",
+    "year": 112,
+    "cat": "施工-水電",
+    "type": "single",
+    "q": "下列何種顏色可作為接地線使用？",
+    "o": {
+      "A": "綠色",
+      "B": "白色",
+      "C": "紅色",
+      "D": "黑色"
+    },
+    "a": [
+      "A"
+    ],
+    "hint": "",
+    "src": "112年學科試題"
+  },
+  {
+    "id": "112-q041",
+    "year": 112,
+    "cat": "共同-職安",
+    "type": "single",
+    "q": "勞工常處於高溫及低溫間交替暴露的情況、或常在有明顯溫差之場所間出入，對勞工的生(心)理 工作負荷之影響一般為何？",
+    "o": {
+      "A": "減少",
+      "B": "無",
+      "C": "增加",
+      "D": "不一定"
+    },
+    "a": [
+      "C"
+    ],
+    "hint": "",
+    "src": "112年學科試題"
+  },
+  {
+    "id": "112-q042",
+    "year": 112,
+    "cat": "施工-輕隔間",
+    "type": "single",
+    "q": "關於輕隔間石膏板牆的施工方式，下述那一項是錯誤？",
+    "o": {
+      "A": "立柱後，加強橫料可視需要再施作",
+      "B": "在門或轉角處需加立柱補強",
+      "C": "一般以30 至60 ㎝間距將立柱套入上下槽鐵固定",
+      "D": "依設計圖放樣 並留意門或開口位置"
+    },
+    "a": [
+      "A"
+    ],
+    "hint": "",
+    "src": "112年學科試題"
+  },
+  {
+    "id": "112-q043",
+    "year": 112,
+    "cat": "管理-進度",
+    "type": "single",
+    "q": "以工程管理而言LF 代表",
+    "o": {
+      "A": "開始的時間",
+      "B": "最快完成時間",
+      "C": "最晚完成時間",
+      "D": "最早完成時間"
+    },
+    "a": [
+      "C"
+    ],
+    "hint": "",
+    "src": "112年學科試題"
+  },
+  {
+    "id": "112-q044",
+    "year": 112,
+    "cat": "法規-建技規",
+    "type": "single",
+    "q": "集合住宅之分戶牆，其牆壁應具有多少小時防火時效",
+    "o": {
+      "A": "一小時",
+      "B": "二小時",
+      "C": "半小時",
+      "D": "三小時"
+    },
+    "a": [
+      "A"
+    ],
+    "hint": "",
+    "src": "112年學科試題"
+  },
+  {
+    "id": "112-q045",
+    "year": 112,
+    "cat": "安全維護",
+    "type": "single",
+    "q": "工作場所及公共區域之安全標誌、安全標示的安全辨識顏色及設計原則，適用於事故防範、火災 防護、衛生危害資訊與緊急疏散等目的，其中表示急救(站)、緊急出口等安全顏色為",
+    "o": {
+      "A": "紅色",
+      "B": "橙 色",
+      "C": "綠色",
+      "D": "黃色"
+    },
+    "a": [
+      "C"
+    ],
+    "hint": "",
+    "src": "112年學科試題"
+  },
+  {
+    "id": "112-q046",
+    "year": 112,
+    "cat": "共同-節能",
+    "type": "single",
+    "q": "砌普通玻璃磚牆時，哪項敘述錯誤？",
+    "o": {
+      "A": "玻璃磚牆最兩端宜設伸縮縫收頭處理",
+      "B": "玻璃磚每隔若干 塊應豎鋼筋補強",
+      "C": "砂漿可使用水泥1 份，砂3 份及防水劑拌合",
+      "D": "砂漿用水量可以多一些"
+    },
+    "a": [
+      "D"
+    ],
+    "hint": "",
+    "src": "112年學科試題"
+  },
+  {
+    "id": "112-q047",
+    "year": 112,
+    "cat": "圖說判讀",
+    "type": "single",
+    "q": "施工圖面常用文字簡寫符號中GL 代表",
+    "o": {
+      "A": "視平線",
+      "B": "水平線",
+      "C": "天花板線",
+      "D": "地盤線"
+    },
+    "a": [
+      "D"
+    ],
+    "hint": "",
+    "src": "112年學科試題"
+  },
+  {
+    "id": "112-q048",
+    "year": 112,
+    "cat": "法規-室裝辦法",
+    "type": "single",
+    "q": "室內裝修管理辦法之主管機關在中央為",
+    "o": {
+      "A": "消防署",
+      "B": "營建署",
+      "C": "警政署",
+      "D": "內政部"
+    },
+    "a": [
+      "D"
+    ],
+    "hint": "",
+    "src": "112年學科試題"
+  },
+  {
+    "id": "112-q049",
+    "year": 112,
+    "cat": "共同-環保",
+    "type": "single",
+    "q": "上下班的交通方式有很多種，其中包括：A.騎腳踏車；B.搭乘大眾交通工具；C.自行開車，請將 前述幾種交通方式之單位排碳量由少至多之排列方式為何？",
+    "o": {
+      "A": "CBA",
+      "B": "ABC",
+      "C": "BAC",
+      "D": "ACB"
+    },
+    "a": [
+      "B"
+    ],
+    "hint": "",
+    "src": "112年學科試題"
+  },
+  {
+    "id": "112-q050",
+    "year": 112,
+    "cat": "法規-職安",
+    "type": "single",
+    "q": "材料進場吊放，捲揚機具作業指揮最應防止可能的災害是",
+    "o": {
+      "A": "有害氣體中毒",
+      "B": "感電",
+      "C": "物體飛落",
+      "D": "缺氧窒息"
+    },
+    "a": [
+      "C"
+    ],
+    "hint": "",
+    "src": "112年學科試題"
+  },
+  {
+    "id": "112-q051",
+    "year": 112,
+    "cat": "施工-水電",
+    "type": "single",
+    "q": "依中華民國國家標準CNS 規定，設備圖例標準，－DWR－之給排水及衛生設備圖例中代表飲水 用之",
+    "o": {
+      "A": "給水管",
+      "B": "排水管",
+      "C": "飲水管",
+      "D": "回水管"
+    },
+    "a": [
+      "D"
+    ],
+    "hint": "",
+    "src": "112年學科試題"
+  },
+  {
+    "id": "112-q052",
+    "year": 112,
+    "cat": "施工-木作",
+    "type": "single",
+    "q": "木作工程中木質薄片貼合後，進行砂磨工作時應",
+    "o": {
+      "A": "沒有限制方向砂磨",
+      "B": "垂直木紋砂磨",
+      "C": "先順木 紋後垂直木紋砂磨",
+      "D": "順木紋砂磨"
+    },
+    "a": [
+      "D"
+    ],
+    "hint": "",
+    "src": "112年學科試題"
+  },
+  {
+    "id": "112-q053",
+    "year": 112,
+    "cat": "丈量放樣",
+    "type": "single",
+    "q": "關於天花板的施作程序，下述那一項是對的",
+    "o": {
+      "A": "定水平線→釘邊料→釘縱向材→釘橫向材→吊筋→ 封板",
+      "B": "定水平線→釘邊料→吊筋→釘縱向材→釘橫向材→封板",
+      "C": "定水平線→釘邊料→釘縱向材 →釘橫向材→封板",
+      "D": "定水平線→釘縱向材→釘橫向材→吊筋→封板"
+    },
+    "a": [
+      "A"
+    ],
+    "hint": "",
+    "src": "112年學科試題"
+  },
+  {
+    "id": "112-q054",
+    "year": 112,
+    "cat": "管理-估算",
+    "type": "single",
+    "q": "十平方公尺約為多少坪",
+    "o": {
+      "A": "4",
+      "B": "0.3025",
+      "C": "3.025",
+      "D": "3.3"
+    },
+    "a": [
+      "C"
+    ],
+    "hint": "",
+    "src": "112年學科試題"
+  },
+  {
+    "id": "112-q055",
+    "year": 112,
+    "cat": "施工-木作",
+    "type": "single",
+    "q": "壁紙一捲一般核計面積坪數為",
+    "o": {
+      "A": "2 坪",
+      "B": "1 坪",
+      "C": "1.2 坪",
+      "D": "1.5 坪"
+    },
+    "a": [
+      "D"
+    ],
+    "hint": "",
+    "src": "112年學科試題"
+  },
+  {
+    "id": "112-q056",
+    "year": 112,
+    "cat": "施工-水電",
+    "type": "single",
+    "q": "為防止連接盒與接線盒之盒內受濕氣侵入，須採用",
+    "o": {
+      "A": "防水型",
+      "B": "防爆型",
+      "C": "防塵型",
+      "D": "開放型"
+    },
+    "a": [
+      "A"
+    ],
+    "hint": "",
+    "src": "112年學科試題"
+  },
+  {
+    "id": "112-q057",
+    "year": 112,
+    "cat": "施工-木作",
+    "type": "single",
+    "q": "安裝普通鉸鏈時，宜選擇下列何種木螺釘？",
+    "o": {
+      "A": "橢圓頭",
+      "B": "圓頭",
+      "C": "六角頭",
+      "D": "平頭"
+    },
+    "a": [
+      "D"
+    ],
+    "hint": "",
+    "src": "112年學科試題"
+  },
+  {
+    "id": "112-q058",
+    "year": 112,
+    "cat": "法規-建技規",
+    "type": "single",
+    "q": "依「建築技術規則」規定，集合住宅係指具有共同基地及共同空間或設備。並具有",
+    "o": {
+      "A": "四個",
+      "B": "一 個",
+      "C": "三個",
+      "D": "二個 住宅單位以上之建築物"
+    },
+    "a": [
+      "C"
+    ],
+    "hint": "",
+    "src": "112年學科試題"
+  },
+  {
+    "id": "112-q059",
+    "year": 112,
+    "cat": "共同-工倫",
+    "type": "single",
+    "q": "故意侵害他人之營業秘密，法院因被害人之請求，最高得酌定損害額幾倍之賠償？",
+    "o": {
+      "A": "2 倍",
+      "B": "4 倍",
+      "C": "3 倍",
+      "D": "1 倍"
+    },
+    "a": [
+      "C"
+    ],
+    "hint": "",
+    "src": "112年學科試題"
+  },
+  {
+    "id": "112-q060",
+    "year": 112,
+    "cat": "施工-塗裝",
+    "type": "single",
+    "q": "噴塗後塗膜產生白霧現象的主要原因為",
+    "o": {
+      "A": "空氣中濕度太低",
+      "B": "空氣中溫度太低",
+      "C": "塗料黏度過高",
+      "D": "空氣中濕度太高"
+    },
+    "a": [
+      "D"
+    ],
+    "hint": "",
+    "src": "112年學科試題"
+  },
+  {
+    "id": "112-q061",
+    "year": 112,
+    "cat": "施工-木作",
+    "type": "multi",
+    "q": "裝修工程使用之集成材係指積層之薄板以平行於纖維方向互相疊合，用黏著劑膠合成一體，並具 結構耐力之構材謂之，集成材的製造依規定應符合下列哪些規定？",
+    "o": {
+      "A": "集成材至少由3 塊膠合板積 成",
+      "B": "膠合板寬度方向之連接，宜採用對接方式，膠合板相鄰上下之接合須錯開，間隔應為厚度之 2 倍以上",
+      "C": "膠合板長向如須連接時宜用斜面接合",
+      "D": "每塊膠合板之厚度以不超過3 ㎝為限"
+    },
+    "a": [
+      "B",
+      "C"
+    ],
+    "hint": "",
+    "src": "112年學科試題"
+  },
+  {
+    "id": "112-q062",
+    "year": 112,
+    "cat": "共同-職安",
+    "type": "multi",
+    "q": "依營造安全衛生設施標準規定，施工中對於施工場所材料之堆放，應置放於穩固、平坦之處，整 齊緊靠堆置及下列哪些為正確？",
+    "o": {
+      "A": "磚堆置高度不得超過1.8 公尺",
+      "B": "瓦堆置高度不得超過2 公尺",
+      "C": "管料之置放，避免在電線上方或下方",
+      "D": "材料儲存位置鄰近開口部分時，應距離該開口部分1.8 公尺"
+    },
+    "a": [
+      "A",
+      "C"
+    ],
+    "hint": "",
+    "src": "112年學科試題"
+  },
+  {
+    "id": "112-q063",
+    "year": 112,
+    "cat": "圖說判讀",
+    "type": "multi",
+    "q": "依據CNS11567-A1042 建築製圖規定，下列哪些為空調及機械設備圖例之符號？",
+    "o": {
+      "A": "",
+      "B": "",
+      "C": "",
+      "D": ""
+    },
+    "a": [
+      "A",
+      "C",
+      "D"
+    ],
+    "hint": "",
+    "src": "112年學科試題"
+  },
+  {
+    "id": "112-q064",
+    "year": 112,
+    "cat": "法規-建技規",
+    "type": "multi",
+    "q": "丈量室内裝修工地現場柱、樑尺寸的目的，下列敘述何者正確？",
+    "o": {
+      "A": "了解建築物結構配置情形",
+      "B": "計算拆除數量的依據",
+      "C": "掌握空間設計的影響因素",
+      "D": "作為分間牆配置的參考依據"
+    },
+    "a": [
+      "A",
+      "C",
+      "D"
+    ],
+    "hint": "",
+    "src": "112年學科試題"
+  },
+  {
+    "id": "112-q065",
+    "year": 112,
+    "cat": "管理-估算",
+    "type": "multi",
+    "q": "有關室內裝修一般常見的魯班尺上半部為文公尺，下列哪些為用於陽宅、神位、佛具尺寸之吉凶 的度量衡之文字？",
+    "o": {
+      "A": "離",
+      "B": "財",
+      "C": "本",
+      "D": "苦"
+    },
+    "a": [
+      "A",
+      "B",
+      "C"
+    ],
+    "hint": "",
+    "src": "112年學科試題"
+  },
+  {
+    "id": "112-q066",
+    "year": 112,
+    "cat": "圖說判讀",
+    "type": "multi",
+    "q": "一般而言室內裝修工程估價須具備有豐富的工地經驗，對工程的施工法、材料的性質、材料的價 格以及施工環境的控制，才能有準確的估價，下列敘述何者正確？",
+    "o": {
+      "A": "工程估價可據以控制工程造 價，降低工程成本",
+      "B": "工程估價可預估工料數量為僱工與採購的依據",
+      "C": "選用適當但不同之施工機 具會影響工料分析",
+      "D": "工料分析不須依據室內裝修設計圖說"
+    },
+    "a": [
+      "A",
+      "B",
+      "C"
+    ],
+    "hint": "",
+    "src": "112年學科試題"
+  },
+  {
+    "id": "112-q067",
+    "year": 112,
+    "cat": "共同-職安",
+    "type": "multi",
+    "q": "依職業安全衛生設施規則規定，雇主設置固定式圓盤鋸、帶鋸、手推刨床、截角機等合計五台以 上時，應指定作業管理人員負責執行下列何事項？",
+    "o": {
+      "A": "作業中，監視送料工具等之使用情形",
+      "B": "指 揮木材加工用機械之操作",
+      "C": "發現木材加工用機械及其安全裝置有異時，應即採取必要之措施",
+      "D": "檢查運輸用機械及其安全裝置"
+    },
+    "a": [
+      "A",
+      "B",
+      "C"
+    ],
+    "hint": "",
+    "src": "112年學科試題"
+  },
+  {
+    "id": "112-q068",
+    "year": 112,
+    "cat": "待分類",
+    "type": "multi",
+    "q": "室內裝修專業技術人員有下列哪些情事者，將註銷其登記證？",
+    "o": {
+      "A": "十年內受停止執行職務處分累計 滿二年",
+      "B": "五年內受停止執行職務處分累計滿一年",
+      "C": "受停止換發登記證處分累計三次",
+      "D": "受停止換 發登記證處分累計二次"
+    },
+    "a": [
+      "A",
+      "C"
+    ],
+    "hint": "",
+    "src": "112年學科試題"
+  },
+  {
+    "id": "112-q069",
+    "year": 112,
+    "cat": "待分類",
+    "type": "multi",
+    "q": "面磚的鋪貼有下列哪些方法？",
+    "o": {
+      "A": "壓著貼面法",
+      "B": "漿砌貼面法",
+      "C": "平鋪貼面法",
+      "D": "直鋪貼面法"
+    },
+    "a": [
+      "A",
+      "B",
+      "C"
+    ],
+    "hint": "",
+    "src": "112年學科試題"
+  },
+  {
+    "id": "112-q070",
+    "year": 112,
+    "cat": "圖說判讀",
+    "type": "multi",
+    "q": "依據CNS11567-A1042 建築製圖規定，有關線條用途種類中，「單點線」之用途為",
+    "o": {
+      "A": "地界線",
+      "B": "中心線",
+      "C": "建築線",
+      "D": "隱蔽線"
+    },
+    "a": [
+      "B",
+      "C"
+    ],
+    "hint": "",
+    "src": "112年學科試題"
+  },
+  {
+    "id": "112-q071",
+    "year": 112,
+    "cat": "施工-金屬",
+    "type": "multi",
+    "q": "圓盤鋸之材料、安裝方法、緣盤應符合下列哪些規定？",
+    "o": {
+      "A": "緣盤之直徑在固定側應大於移動側",
+      "B": "緣盤之直徑在固定側應小於移動側",
+      "C": "圓鋸軸之夾緊螺栓，應為不可任意旋動者",
+      "D": "使用於緣盤之 固定用螺桿、螺帽等施有防鬆措施，以防止制動器制動引起鬆動"
+    },
+    "a": [
+      "C",
+      "D"
+    ],
+    "hint": "",
+    "src": "112年學科試題"
+  },
+  {
+    "id": "112-q072",
+    "year": 112,
+    "cat": "待分類",
+    "type": "multi",
+    "q": "玻璃安裝用黏劑成份之彈性材料，凝結後應具有下列何特性？",
+    "o": {
+      "A": "抗壓性",
+      "B": "防剝落力",
+      "C": "復原性",
+      "D": "伸展性"
+    },
+    "a": [
+      "B",
+      "C",
+      "D"
+    ],
+    "hint": "",
+    "src": "112年學科試題"
+  },
+  {
+    "id": "112-q073",
+    "year": 112,
+    "cat": "管理-估算",
+    "type": "multi",
+    "q": "營造用各類物材之儲存、堆積及排列，不得儲存於距",
+    "o": {
+      "A": "庫門",
+      "B": "升降機",
+      "C": "窗樘",
+      "D": "廁所 等二公尺 範圍以內"
+    },
+    "a": [
+      "A",
+      "B"
+    ],
+    "hint": "",
+    "src": "112年學科試題"
+  },
+  {
+    "id": "112-q074",
+    "year": 112,
+    "cat": "施工-輕隔間",
+    "type": "multi",
+    "q": "下列有關輕鋼架天花工程敘述，何者正確？",
+    "o": {
+      "A": "天花板內水電配管不會影響輕鋼架天花工程進場施 做時程",
+      "B": "輕鋼架天花在高程放樣後，應先安裝吊筋再釘收邊條",
+      "C": "應戴手套進行安置板材作業， 主要目的係避免造成板材髒污",
+      "D": "用於支撐主架的吊筋，最大容許間距不宜超過120 公分"
+    },
+    "a": [
+      "C",
+      "D"
+    ],
+    "hint": "",
+    "src": "112年學科試題"
+  },
+  {
+    "id": "112-q075",
+    "year": 112,
+    "cat": "施工-木作",
+    "type": "multi",
+    "q": "木材之品質下列哪些為不正確？",
+    "o": {
+      "A": "優良之木材，其質地均勻纖維平直無死節",
+      "B": "年輪寬鬆者較年 輪緊密者佳",
+      "C": "木材孔隙所含樹液、樹脂量較少者，其強度與耐久性較差",
+      "D": "良好的木材，以重物 擊之，其聲清脆"
+    },
+    "a": [
+      "B",
+      "C"
+    ],
+    "hint": "",
+    "src": "112年學科試題"
+  },
+  {
+    "id": "112-q076",
+    "year": 112,
+    "cat": "施工-木作",
+    "type": "multi",
+    "q": "木材人工乾燥的方式有下列哪些？",
+    "o": {
+      "A": "熱氣乾燥法",
+      "B": "高壓乾燥法",
+      "C": "高週波乾燥法",
+      "D": "煮沸乾燥法"
+    },
+    "a": [
+      "A",
+      "C",
+      "D"
+    ],
+    "hint": "",
+    "src": "112年學科試題"
+  },
+  {
+    "id": "112-q077",
+    "year": 112,
+    "cat": "圖說判讀",
+    "type": "multi",
+    "q": "下列何者為影響工程估價的重要因素？",
+    "o": {
+      "A": "施工人員",
+      "B": "設計施工圖",
+      "C": "工資價格",
+      "D": "材料種類價格"
+    },
+    "a": [
+      "B",
+      "C",
+      "D"
+    ],
+    "hint": "",
+    "src": "112年學科試題"
+  },
+  {
+    "id": "112-q078",
+    "year": 112,
+    "cat": "施工-木作",
+    "type": "multi",
+    "q": "裝修工程中之木材防腐劑應具備",
+    "o": {
+      "A": "易於停留於木材表面",
+      "B": "不妨礙油漆之塗佈(刷)",
+      "C": "化學及物理 性質需穩定",
+      "D": "防腐性能要強"
+    },
+    "a": [
+      "B",
+      "C",
+      "D"
+    ],
+    "hint": "",
+    "src": "112年學科試題"
+  },
+  {
+    "id": "112-q079",
+    "year": 112,
+    "cat": "管理-估算",
+    "type": "multi",
+    "q": "下列面積計算及單位換算何者正確？",
+    "o": {
+      "A": "長18 台尺×寬12 台尺＝4 坪",
+      "B": "長9 台尺×寬4 台尺＝1 坪",
+      "C": "長12.5 公尺×寬8 公尺＝100 平方公尺約為30.25 坪",
+      "D": "長8 公尺×寬5 公尺＝40 平方公尺約為 12.1 坪"
+    },
+    "a": [
+      "B",
+      "C",
+      "D"
+    ],
+    "hint": "",
+    "src": "112年學科試題"
+  },
+  {
+    "id": "112-q080",
+    "year": 112,
+    "cat": "待分類",
+    "type": "multi",
+    "q": "依施工規範地毯準備工作，哪些是正確",
+    "o": {
+      "A": "水電、空調及管線等隱蔽部分，檢驗完成後，方可開始 各種地毯舖裝工作",
+      "B": "將地毯全面展開於室溫，並保持至少12 小時以上",
+      "C": "地面有裂縫、凹凸不 平、起沙或脫殼現象，應先處理平整",
+      "D": "RC 樓地板面需有30 天以上之乾燥時間，始可舖設地毯"
+    },
+    "a": [
+      "A",
+      "C"
+    ],
+    "hint": "",
+    "src": "112年學科試題"
+  }
+];
+
+/* =====================================================
+   State & Storage
+   ===================================================== */
+const LS_KEY = 'mo_12600_quiz_v1';
+const state = {
+  bank: [...STARTER_BANK],
+  log: {},            // id -> {seen, correct, wrong, lastWrong, intervalDay}
+  session: null,
+};
+
+function loadState(){
+  try{
+    const raw = localStorage.getItem(LS_KEY);
+    if(!raw) return;
+    const d = JSON.parse(raw);
+    if(d.bank && d.bank.length) state.bank = d.bank;
+    if(d.log) state.log = d.log;
+  }catch(e){console.warn('load fail',e)}
+}
+function saveState(){
+  try{
+    localStorage.setItem(LS_KEY,JSON.stringify({bank:state.bank,log:state.log,ts:Date.now()}));
+  }catch(e){console.warn('save fail',e)}
+}
+function resetState(){
+  state.log = {};
+  saveState();
+  renderHome();
+  toast('紀錄已重置','ok');
+}
+
+/* =====================================================
+   Utilities
+   ===================================================== */
+function $(id){return document.getElementById(id)}
+function el(tag,cls,txt){const e=document.createElement(tag);if(cls)e.className=cls;if(txt!=null)e.textContent=txt;return e}
+function shuffle(arr){const a=[...arr];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+function arrEq(a,b){if(a.length!==b.length)return false;const s=new Set(b);return a.every(x=>s.has(x))}
+function toast(msg,type=''){
+  const t=el('div','toast'+(type?' '+type:''),msg);
+  $('toast-host').appendChild(t);
+  setTimeout(()=>t.remove(),2200);
+}
+function show(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.add('hidden'));
+  $(id).classList.remove('hidden');
+  window.scrollTo(0,0);
+}
+function fmtTime(sec){const m=Math.floor(sec/60),s=sec%60;return String(m).padStart(2,'0')+':'+String(s).padStart(2,'0')}
+
+/* =====================================================
+   Home rendering
+   ===================================================== */
+function getWrongIds(){
+  return Object.keys(state.log).filter(id=>{
+    const l=state.log[id];return l.lastWrong && state.bank.find(q=>q.id===id);
+  });
+}
+function getTrapIds(){
+  return state.bank.filter(q=>q.trap).map(q=>q.id);
+}
+function getCategories(){
+  const map={};
+  state.bank.forEach(q=>{map[q.cat]=(map[q.cat]||0)+1});
+  return map;
+}
+function renderHome(){
+  $('stat-bank').textContent = state.bank.length;
+  const ids=Object.keys(state.log);
+  const done=ids.reduce((s,id)=>s+(state.log[id].seen||0),0);
+  const corr=ids.reduce((s,id)=>s+(state.log[id].correct||0),0);
+  const wrongIds=getWrongIds();
+  $('stat-done').textContent = done;
+  $('stat-acc').textContent = done? Math.round(corr/done*100)+'%':'—';
+  $('stat-wrong').textContent = wrongIds.length;
+  if(wrongIds.length){
+    $('wrong-badge').style.display='inline-block';
+    $('wrong-badge').textContent=wrongIds.length;
+    $('wrong-count-label').textContent=`${wrongIds.length} 題待攻克`;
+  }else{
+    $('wrong-badge').style.display='none';
+    $('wrong-count-label').textContent='只練過去答錯的';
+  }
+
+  // Category stats
+  const catMap={};
+  state.bank.forEach(q=>{
+    if(!catMap[q.cat])catMap[q.cat]={total:0,seen:0,correct:0};
+    catMap[q.cat].total++;
+    const l=state.log[q.id];
+    if(l){catMap[q.cat].seen+=l.seen||0;catMap[q.cat].correct+=l.correct||0}
+  });
+  const catStats=$('cat-stats');
+  catStats.innerHTML='';
+  Object.entries(catMap).sort().forEach(([cat,v])=>{
+    const acc=v.seen?Math.round(v.correct/v.seen*100):null;
+    const chip=el('span','cat-chip');
+    chip.innerHTML=`${cat} <span class="n">${acc!==null?acc+'%':v.total+'題'}</span>`;
+    catStats.appendChild(chip);
+  });
+
+  // Category picker panel (hidden by default)
+  const catList=$('cat-list');
+  catList.innerHTML='';
+  Object.entries(catMap).sort().forEach(([cat,v])=>{
+    const b=el('button','cat-chip');
+    b.innerHTML=`${cat} <span class="n">${v.total}</span>`;
+    b.onclick=()=>startQuiz('cat',cat);
+    catList.appendChild(b);
+  });
+}
+
+/* =====================================================
+   Session: quiz
+   ===================================================== */
+function startQuiz(mode,cat){
+  let pool=[];
+  if(mode==='random') pool=shuffle(state.bank).slice(0,Math.min(20,state.bank.length));
+  else if(mode==='wrong'){
+    const wids=getWrongIds();
+    if(!wids.length){toast('目前沒有錯題 ✓','ok');return}
+    pool=shuffle(state.bank.filter(q=>wids.includes(q.id)));
+  }else if(mode==='trap'){
+    const tids=getTrapIds();
+    if(!tids.length){toast('此題庫沒有陷阱題標記','');return}
+    pool=shuffle(state.bank.filter(q=>tids.includes(q.id)));
+  }else if(mode==='mock'){
+    const singles=state.bank.filter(q=>q.type==='single');
+    const multis=state.bank.filter(q=>q.type==='multi');
+    const n1=Math.min(60,singles.length),n2=Math.min(20,multis.length);
+    pool=[...shuffle(singles).slice(0,n1),...shuffle(multis).slice(0,n2)];
+    if(pool.length<20){toast('模擬考建議匯入官方 718 題後再進行','no');return}
+  }else if(mode==='cat'){
+    pool=shuffle(state.bank.filter(q=>q.cat===cat));
+  }else if(mode==='flash'){
+    return startFlash(cat);
+  }
+
+  if(!pool.length){toast('題目不足','no');return}
+
+  state.session={
+    mode,pool,idx:0,answers:[],start:Date.now(),
+    isMock:mode==='mock',
+    timeLimit:mode==='mock'?3600:null
+  };
+  show('quiz-screen');
+  if(state.session.isMock){
+    $('timer').classList.remove('hidden');
+    startTimer();
+  }else{
+    $('timer').classList.add('hidden');
+  }
+  renderQuestion();
+}
+
+let timerInt=null;
+function startTimer(){
+  clearInterval(timerInt);
+  const start=Date.now();
+  const upd=()=>{
+    const elapsed=Math.floor((Date.now()-start)/1000);
+    const left=state.session.timeLimit-elapsed;
+    if(left<=0){
+      clearInterval(timerInt);
+      endQuiz();
+      return;
+    }
+    $('timer').textContent=fmtTime(left);
+    if(left<300)$('timer').classList.add('warn');
+  };
+  upd();
+  timerInt=setInterval(upd,1000);
+}
+
+let selected=[];
+function renderQuestion(){
+  const s=state.session;
+  const q=s.pool[s.idx];
+  $('q-cur').textContent=s.idx+1;
+  $('q-tot').textContent=s.pool.length;
+  $('q-fill').style.width=((s.idx)/s.pool.length*100)+'%';
+
+  const streakCount=countStreak();
+  $('q-streak').textContent=streakCount>=3?`🔥 ${streakCount} 連對`:'';
+
+  $('q-cat').textContent=q.cat;
+  $('q-type').textContent=q.type==='multi'?'複選':'單選';
+  $('q-src').textContent=q.src||'';
+  $('q-trap-tag').classList.toggle('hidden',!q.trap);
+  $('q-text').textContent=q.q;
+
+  const opts=$('q-opts');
+  opts.innerHTML='';
+  opts.classList.toggle('multi',q.type==='multi');
+  selected=[];
+  Object.entries(q.o).forEach(([k,v])=>{
+    const b=el('button','opt');
+    b.dataset.key=k;
+    b.innerHTML=`<span class="key">${k}</span><span class="chk"></span><span class="txt">${v}</span>`;
+    b.onclick=()=>toggleOpt(b,k,q);
+    opts.appendChild(b);
+  });
+
+  $('q-expl').innerHTML='';
+  $('btn-submit').classList.remove('hidden');
+  $('btn-next').classList.add('hidden');
+  $('btn-skip').classList.remove('hidden');
+}
+function countStreak(){
+  const ans=state.session.answers;
+  let c=0;
+  for(let i=ans.length-1;i>=0;i--){if(ans[i].correct)c++;else break}
+  return c;
+}
+
+function toggleOpt(btn,key,q){
+  if(btn.classList.contains('disabled'))return;
+  if(q.type==='single'){
+    document.querySelectorAll('.opt').forEach(o=>o.classList.remove('selected'));
+    btn.classList.add('selected');
+    selected=[key];
+  }else{
+    btn.classList.toggle('selected');
+    selected=[...document.querySelectorAll('.opt.selected')].map(o=>o.dataset.key);
+  }
+}
+
+function submitAnswer(){
+  const s=state.session;const q=s.pool[s.idx];
+  if(!selected.length){toast('請先選擇答案','no');return}
+  const correct=arrEq(selected,q.a);
+
+  // Lock options + feedback
+  document.querySelectorAll('.opt').forEach(o=>{
+    o.classList.add('disabled');
+    const k=o.dataset.key;
+    if(q.a.includes(k))o.classList.add('correct');
+    else if(o.classList.contains('selected'))o.classList.add('wrong');
+  });
+
+  // Log
+  if(!state.log[q.id])state.log[q.id]={seen:0,correct:0,wrong:0,lastWrong:false};
+  state.log[q.id].seen++;
+  if(correct){state.log[q.id].correct++;state.log[q.id].lastWrong=false}
+  else{state.log[q.id].wrong++;state.log[q.id].lastWrong=true}
+  saveState();
+
+  s.answers.push({id:q.id,correct,selected});
+
+  // Explanation（非模擬考顯示）
+  if(!s.isMock){
+    const wrap=el('div','expl '+(correct?'ok':'no'));
+    const res=el('div','result '+(correct?'ok':'no'),correct?'✓ 答對了':'✗ 答錯了');
+    wrap.appendChild(res);
+    if(q.hint){
+      wrap.appendChild(el('div','hint-title','答題關鍵'));
+      wrap.appendChild(el('div','hint-text',q.hint));
+    }
+    if(q.trap){
+      wrap.appendChild(el('div','hint-title','⚠️ 常見陷阱'));
+      const t=el('div','hint-text trap',q.trap);
+      wrap.appendChild(t);
+    }
+    if(q.mnemonic){
+      wrap.appendChild(el('div','hint-title','🔑 速記法'));
+      const m=el('div','hint-text mnemonic',q.mnemonic);
+      wrap.appendChild(m);
+    }
+    const ans=q.a.join('、');
+    const ansDiv=el('div','hint-text');ansDiv.innerHTML=`<strong>正解</strong>：${ans}`;
+    wrap.appendChild(ansDiv);
+    $('q-expl').appendChild(wrap);
+  }
+
+  $('btn-submit').classList.add('hidden');
+  $('btn-skip').classList.add('hidden');
+  $('btn-next').classList.remove('hidden');
+  $('btn-next').textContent = (s.idx+1>=s.pool.length)?'查看結果':'下一題 →';
+
+  if(s.isMock){
+    // Mock mode: auto advance after brief flash
+    setTimeout(nextQuestion,250);
+  }
+}
+
+function skipQuestion(){
+  const s=state.session;
+  s.answers.push({id:s.pool[s.idx].id,correct:false,skipped:true});
+  nextQuestion();
+}
+
+function nextQuestion(){
+  const s=state.session;
+  s.idx++;
+  if(s.idx>=s.pool.length)endQuiz();
+  else renderQuestion();
+}
+
+function endQuiz(){
+  clearInterval(timerInt);
+  const s=state.session;
+  const total=s.pool.length;
+  const right=s.answers.filter(a=>a.correct).length;
+  const skipped=s.answers.filter(a=>a.skipped).length;
+  const wrong=total-right-skipped;
+  // Score: if mock → 學科規則（單選 1 分、複選 2 分）
+  let score;
+  if(s.isMock){
+    let sc=0;
+    s.answers.forEach((a,i)=>{
+      if(a.correct){
+        const q=s.pool[i];
+        sc += q.type==='multi'?2:1;
+      }
+    });
+    const maxScore=s.pool.reduce((t,q)=>t+(q.type==='multi'?2:1),0);
+    score = Math.round(sc/maxScore*100);
+  }else{
+    score = Math.round(right/total*100);
+  }
+  const elapsed=Math.floor((Date.now()-s.start)/1000);
+  $('s-score').textContent=score;
+  $('s-score').className='score '+(score>=60?'pass':'fail');
+  $('s-verdict').textContent=score>=60?(s.isMock?'✓ 通過 60 分及格線':'表現不錯'):'✗ 未達 60 分，再練一輪';
+  $('s-verdict').className='verdict '+(score>=60?'pass':'fail');
+  $('s-right').textContent=right;
+  $('s-wrong').textContent=wrong;
+  $('s-skip').textContent=skipped;
+  $('s-acc').textContent=total?Math.round(right/total*100)+'%':'—';
+  $('s-time').textContent=fmtTime(elapsed);
+
+  // Wrong list
+  const wrongs=s.answers.map((a,i)=>({a,q:s.pool[i]})).filter(x=>!x.a.correct&&!x.a.skipped);
+  if(wrongs.length){
+    $('s-wrongs').classList.remove('hidden');
+    const box=$('s-wrong-items');box.innerHTML='';
+    wrongs.forEach(({a,q})=>{
+      const it=el('div','wrong-item');
+      it.innerHTML=`<div class="q"><strong>[${q.cat}]</strong> ${q.q}</div><div class="a">你選：${a.selected.join('、')}　正解：${q.a.join('、')}</div>`;
+      box.appendChild(it);
+    });
+  }else{
+    $('s-wrongs').classList.add('hidden');
+  }
+  show('summary-screen');
+}
+
+/* =====================================================
+   Flashcard mode
+   ===================================================== */
+function startFlash(cat){
+  const pool=shuffle(state.bank);
+  state.session={mode:'flash',pool,idx:0,revealed:false};
+  $('f-tot').textContent=pool.length;
+  show('flash-screen');
+  renderFlash();
+}
+function renderFlash(){
+  const s=state.session;const q=s.pool[s.idx];
+  s.revealed=false;
+  $('f-cur').textContent=s.idx+1;
+  $('f-fill').style.width=((s.idx+1)/s.pool.length*100)+'%';
+  $('f-cat').textContent=q.cat;
+  $('f-q').textContent=q.q+'\n\n'+Object.entries(q.o).map(([k,v])=>`(${k}) ${v}`).join('\n');
+  $('f-q').style.whiteSpace='pre-line';
+  $('f-correct').textContent=q.a.join('、');
+  $('f-hint').textContent=q.hint||'（此題無答題關鍵）';
+  $('f-ans').classList.add('hidden');
+  $('f-prompt').classList.remove('hidden');
+}
+function flipFlash(){
+  const s=state.session;
+  if(s.revealed)return;
+  s.revealed=true;
+  $('f-ans').classList.remove('hidden');
+  $('f-prompt').classList.add('hidden');
+}
+function flashNext(){
+  const s=state.session;
+  if(s.idx+1>=s.pool.length){
+    toast('速記完成 ✓','ok');show('home-screen');renderHome();return;
+  }
+  s.idx++;renderFlash();
+}
+function flashPrev(){
+  const s=state.session;if(s.idx<=0)return;
+  s.idx--;renderFlash();
+}
+function flashMark(){
+  const q=state.session.pool[state.session.idx];
+  if(!state.log[q.id])state.log[q.id]={seen:0,correct:0,wrong:0,lastWrong:false};
+  state.log[q.id].lastWrong=true;
+  state.log[q.id].wrong=(state.log[q.id].wrong||0)+1;
+  saveState();
+  toast('已標為不熟 · 加入錯題庫','');
+  flashNext();
+}
+
+/* =====================================================
+   Modal: Import / Export
+   ===================================================== */
+function openImport(){
+  const m=$('modal');
+  m.innerHTML=`
+    <h2>⬆️ 匯入題庫</h2>
+    <p>貼上 JSON 陣列，或貼題目文字交給 Claude 轉換。支援 <strong>合併</strong> 或 <strong>取代</strong> 現有題庫。</p>
+    <p style="color:var(--muted);font-size:12px">格式範例：</p>
+<pre>[
+ {
+  "id":"q001",
+  "cat":"法規-室裝辦法",
+  "type":"single",  // 或 "multi"
+  "q":"題目文字",
+  "o":{"A":"...","B":"...","C":"...","D":"..."},
+  "a":["A"],        // 複選例：["A","C"]
+  "hint":"答題關鍵（選填）",
+  "trap":"陷阱警示（選填）",
+  "mnemonic":"速記法（選填）",
+  "src":"113年"
+ }
+]</pre>
+    <textarea id="imp-ta" placeholder="貼上 JSON..."></textarea>
+    <div class="modal-actions">
+      <button class="btn" id="imp-cancel">取消</button>
+      <button class="btn" id="imp-merge">合併加入</button>
+      <button class="btn primary" id="imp-replace">取代題庫</button>
+    </div>`;
+  $('modal-bg').classList.remove('hidden');
+  $('imp-cancel').onclick=closeModal;
+  $('imp-merge').onclick=()=>doImport('merge');
+  $('imp-replace').onclick=()=>doImport('replace');
+}
+function doImport(mode){
+  try{
+    const data=JSON.parse($('imp-ta').value);
+    if(!Array.isArray(data))throw new Error('必須為陣列');
+    // Validate
+    data.forEach((q,i)=>{
+      if(!q.id||!q.q||!q.o||!q.a)throw new Error(`第 ${i+1} 題缺欄位（id/q/o/a）`);
+    });
+    if(mode==='replace'){state.bank=data}
+    else{
+      const ids=new Set(state.bank.map(q=>q.id));
+      data.forEach(q=>{if(!ids.has(q.id))state.bank.push(q)});
+    }
+    saveState();renderHome();closeModal();
+    toast(`已${mode==='replace'?'取代':'合併'}題庫，現 ${state.bank.length} 題`,'ok');
+  }catch(e){toast('解析失敗：'+e.message,'no')}
+}
+function openExport(){
+  const m=$('modal');
+  const data={bank:state.bank,log:state.log,exported:new Date().toISOString()};
+  m.innerHTML=`
+    <h2>⬇️ 匯出資料</h2>
+    <p>複製下方 JSON 另存備份，或直接下載 .json 檔。</p>
+    <textarea id="exp-ta" readonly></textarea>
+    <div class="modal-actions">
+      <button class="btn" id="exp-close">關閉</button>
+      <button class="btn" id="exp-copy">複製</button>
+      <button class="btn primary" id="exp-dl">下載 .json</button>
+    </div>`;
+  $('exp-ta').value=JSON.stringify(data,null,2);
+  $('modal-bg').classList.remove('hidden');
+  $('exp-close').onclick=closeModal;
+  $('exp-copy').onclick=()=>{$('exp-ta').select();document.execCommand('copy');toast('已複製','ok')};
+  $('exp-dl').onclick=()=>{
+    const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');a.href=url;a.download='12600-quiz-backup.json';a.click();
+    URL.revokeObjectURL(url);
+  };
+}
+function openReset(){
+  const m=$('modal');
+  m.innerHTML=`
+    <h2>⟲ 重置選項</h2>
+    <p>選擇要重置的範圍：</p>
+    <div class="modal-actions" style="flex-direction:column;gap:8px;align-items:stretch">
+      <button class="btn" id="rst-log">只清作答紀錄（保留題庫）</button>
+      <button class="btn danger" id="rst-all">全部重置（清題庫 + 紀錄）</button>
+      <button class="btn ghost" id="rst-cancel">取消</button>
+    </div>`;
+  $('modal-bg').classList.remove('hidden');
+  $('rst-log').onclick=()=>{state.log={};saveState();renderHome();closeModal();toast('作答紀錄已清','ok')};
+  $('rst-all').onclick=()=>{state.bank=[...STARTER_BANK];state.log={};saveState();renderHome();closeModal();toast('已重置為預設 30 題','ok')};
+  $('rst-cancel').onclick=closeModal;
+}
+function closeModal(){$('modal-bg').classList.add('hidden')}
+
+/* =====================================================
+   Wiring
+   ===================================================== */
+document.addEventListener('DOMContentLoaded',()=>{
+  loadState();
+  renderHome();
+
+  // Mode buttons
+  document.querySelectorAll('.mode').forEach(b=>{
+    b.onclick=()=>{
+      const m=b.dataset.mode;
+      if(m==='cat'){$('cat-panel').classList.toggle('hidden');return}
+      startQuiz(m);
+    };
+  });
+
+  // Header buttons
+  $('btn-import').onclick=openImport;
+  $('btn-export').onclick=openExport;
+  $('btn-reset').onclick=openReset;
+
+  // Quiz actions
+  $('btn-back').onclick=()=>{if(confirm('離開本輪？進度將不會儲存'))show('home-screen')};
+  $('btn-submit').onclick=submitAnswer;
+  $('btn-skip').onclick=skipQuestion;
+  $('btn-next').onclick=nextQuestion;
+
+  // Flash actions
+  $('btn-back-flash').onclick=()=>show('home-screen');
+  $('flash-card').onclick=flipFlash;
+  $('btn-flash-next').onclick=flashNext;
+  $('btn-flash-prev').onclick=flashPrev;
+  $('btn-flash-mark').onclick=flashMark;
+
+  // Summary actions
+  $('btn-home').onclick=()=>{show('home-screen');renderHome()};
+  $('btn-retry').onclick=()=>{
+    const mode=state.session?.mode||'random';
+    startQuiz(mode);
+  };
+
+  // Modal close on bg click
+  $('modal-bg').onclick=(e)=>{if(e.target.id==='modal-bg')closeModal()};
+
+  // Touch swipe for flashcard
+  let _tx=0;
+  document.addEventListener('touchstart',(e)=>{_tx=e.touches[0].clientX;},{passive:true});
+  document.addEventListener('touchend',(e)=>{
+    const flashActive=!$('flash-screen').classList.contains('hidden');
+    if(!flashActive)return;
+    const dx=e.changedTouches[0].clientX-_tx;
+    if(Math.abs(dx)>50){dx<0?flashNext():flashPrev();}
+  },{passive:true});
+
+  // Touch swipe for quiz (left = next/submit)
+  let _qx=0;
+  document.addEventListener('touchstart',(e)=>{_qx=e.touches[0].clientX;},{passive:true});
+  document.addEventListener('touchend',(e)=>{
+    const quizActive=!$('quiz-screen').classList.contains('hidden');
+    if(!quizActive)return;
+    const dx=e.changedTouches[0].clientX-_qx;
+    if(dx<-80){
+      if(!$('btn-next').classList.contains('hidden'))$('btn-next').click();
+    }
+  },{passive:true});
+
+  // Keyboard shortcuts
+  document.addEventListener('keydown',(e)=>{
+    if($('modal-bg').classList.contains('hidden')===false)return;
+    const quizActive=!$('quiz-screen').classList.contains('hidden');
+    const flashActive=!$('flash-screen').classList.contains('hidden');
+    if(quizActive){
+      if(['1','2','3','4'].includes(e.key)){
+        const keys=['A','B','C','D'];
+        const btn=document.querySelector(`.opt[data-key="${keys[+e.key-1]}"]`);
+        if(btn&&!btn.classList.contains('disabled')){btn.click();e.preventDefault()}
+      }else if(e.key==='Enter'||e.key===' '){
+        if(!$('btn-next').classList.contains('hidden'))$('btn-next').click();
+        else if(!$('btn-submit').classList.contains('hidden'))$('btn-submit').click();
+        e.preventDefault();
+      }else if(e.key==='Escape'){$('btn-back').click()}
+    }else if(flashActive){
+      if(e.key==='ArrowRight'||e.key===' ')flashNext();
+      else if(e.key==='ArrowLeft')flashPrev();
+      else if(e.key==='Enter')flipFlash();
+      else if(e.key==='Escape')show('home-screen');
+    }
+  });
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,24 @@
+{
+  "name": "乙級室裝 12600 刷題",
+  "short_name": "室裝刷題",
+  "description": "12600 乙級建築物室內裝修工程管理技術士 考照刷題系統",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#0b0b0d",
+  "theme_color": "#0b0b0d",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
