@@ -194,6 +194,29 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 }
 
 footer{text-align:center;color:var(--muted-2);font-size:11px;padding:20px 0 10px;letter-spacing:.05em}
+
+/* ===== Version tag ===== */
+.ver-tag{font-size:10px;color:var(--muted-2);background:var(--surface-2);border:1px solid var(--border);padding:2px 7px;border-radius:999px;font-weight:500;letter-spacing:.05em;flex-shrink:0}
+
+/* ===== Guide screen ===== */
+.guide-section{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:18px 16px;margin-bottom:12px}
+.guide-badge{display:inline-block;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;background:var(--accent-dim);color:var(--accent);padding:3px 10px;border-radius:999px;margin-bottom:10px}
+.guide-badge-warn{background:var(--wrong-dim);color:var(--wrong)}
+.guide-h2{font-size:15px;font-weight:700;margin-bottom:8px;line-height:1.4}
+.guide-p{font-size:14px;color:var(--muted);line-height:1.7;margin-bottom:8px}
+.guide-p strong{color:var(--text)}
+.guide-tip{font-size:13px;background:var(--hint-dim);border-left:3px solid var(--hint);color:var(--text);padding:10px 12px;border-radius:0 8px 8px 0;line-height:1.7;margin-top:8px}
+.guide-tip-warn{background:var(--wrong-dim);border-left-color:var(--wrong)}
+.guide-step{display:flex;gap:12px;align-items:flex-start;margin-bottom:12px}
+.guide-step:last-of-type{margin-bottom:4px}
+.step-num{flex-shrink:0;width:26px;height:26px;border-radius:999px;background:var(--accent);color:#000;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;margin-top:2px}
+.guide-step div{font-size:14px;line-height:1.7;color:var(--muted)}
+.guide-step div strong{color:var(--text)}
+.guide-mode-row{display:flex;gap:12px;align-items:flex-start;padding:8px 0;border-bottom:1px solid var(--border)}
+.guide-mode-row:last-child{border-bottom:none}
+.guide-emo{font-size:20px;flex-shrink:0;width:28px;text-align:center;margin-top:1px}
+.guide-mode-row div{font-size:13px;color:var(--muted);line-height:1.6}
+.guide-mode-row div strong{color:var(--text)}
 </style>
 </head>
 <body>
@@ -203,6 +226,8 @@ footer{text-align:center;color:var(--muted-2);font-size:11px;padding:20px 0 10px
 <div id="home-screen" class="screen">
   <header class="topbar">
     <h1>🧾 乙級室裝 12600<span class="tag-mo">· Mo</span></h1>
+    <span class="ver-tag">v1.0</span>
+    <button class="icon-btn" id="btn-guide" title="使用說明">?</button>
     <button class="icon-btn" id="btn-import" title="匯入題庫">⬆️</button>
     <button class="icon-btn" id="btn-export" title="匯出紀錄">⬇️</button>
     <button class="icon-btn" id="btn-reset" title="重置">⟲</button>
@@ -257,8 +282,62 @@ footer{text-align:center;color:var(--muted-2);font-size:11px;padding:20px 0 10px
 
   <div class="section-title">📊 分類表現</div>
   <div class="cats" id="cat-stats"></div>
+  <footer>v1.0 · 109–112 年考古題 · 320 題</footer>
+</div>
 
-  <footer>※ Demo 30 題為考試範圍重點示範，答題前請匯入官方 718 題題庫</footer>
+<!-- ========= Guide screen ========= -->
+<div id="guide-screen" class="screen hidden">
+  <header class="topbar">
+    <button class="icon-btn" id="btn-back-guide">←</button>
+    <h1>使用說明</h1>
+  </header>
+
+  <div class="guide-section">
+    <div class="guide-badge">學科考試</div>
+    <h2 class="guide-h2">這個系統是什麼？</h2>
+    <p class="guide-p">乙級室裝 12600 <strong>學科</strong>考試刷題機。把 109–112 年 4 年官方考古題（320題）全部內建，直接用手機刷，不需要上課。</p>
+    <div class="guide-tip">考試結構：80 題，單選 60 題（1分）+ 複選 20 題（2分），共 100 分，<strong>60 分及格</strong>，100 分鐘作答。</div>
+  </div>
+
+  <div class="guide-section">
+    <div class="guide-badge">刷題策略</div>
+    <h2 class="guide-h2">Mo 的備考路線（不上課版）</h2>
+    <div class="guide-step"><span class="step-num">1</span><div><strong>第一週：摸底</strong><br>每天刷「隨機練習」2 輪（20題×2），感受題目長相，不用管對錯。</div></div>
+    <div class="guide-step"><span class="step-num">2</span><div><strong>第二～三週：分類集中</strong><br>點「分類練習」，從題數最多的類別開始：施工-泥作 → 施工-木作 → 管理-估算 → 法規-建技規。</div></div>
+    <div class="guide-step"><span class="step-num">3</span><div><strong>每天睡前：錯題複習</strong><br>點「錯題複習」，只練答錯過的題，10 分鐘清掉弱點。</div></div>
+    <div class="guide-step"><span class="step-num">4</span><div><strong>考前一週：模擬考</strong><br>點「模擬考」，完整 80 題限時 100 分鐘，目標先穩過 60 分。</div></div>
+    <div class="guide-tip">考古題重複率高達 70%+，刷完 4 年等於掌握核心題型。</div>
+  </div>
+
+  <div class="guide-section">
+    <div class="guide-badge">各模式說明</div>
+    <div class="guide-mode-row"><span class="guide-emo">🎲</span><div><strong>隨機練習</strong> — 每次隨機出 20 題，最適合日常暖身</div></div>
+    <div class="guide-mode-row"><span class="guide-emo">⚡</span><div><strong>速記模式</strong> — Flashcard，快速翻閱答案，不計分，適合睡前快速過</div></div>
+    <div class="guide-mode-row"><span class="guide-emo">❌</span><div><strong>錯題複習</strong> — 只出答錯過的題，針對弱點補強</div></div>
+    <div class="guide-mode-row"><span class="guide-emo">🪤</span><div><strong>陷阱題</strong> — 專出有「否定句、例外條款」的高錯誤率題</div></div>
+    <div class="guide-mode-row"><span class="guide-emo">📝</span><div><strong>模擬考</strong> — 完整 80 題限時，最接近正式考試</div></div>
+    <div class="guide-mode-row"><span class="guide-emo">📚</span><div><strong>分類練習</strong> — 選一個類別集中刷，適合法規類深入複習</div></div>
+  </div>
+
+  <div class="guide-section">
+    <div class="guide-badge guide-badge-warn">術科說明</div>
+    <h2 class="guide-h2">術科要另外準備</h2>
+    <p class="guide-p">這個系統只涵蓋<strong>學科</strong>。術科（製圖、施工計畫書）是完全不同的考試，需要另外練習。</p>
+    <div class="guide-tip guide-tip-warn">術科內容：<br>① 室內裝修施工圖繪製（手繪或 CAD）<br>② 施工計畫書撰寫<br>建議找術科補習班或買歷屆術科題目另行練習，不打算上課的話至少要看歷屆術科範例。</div>
+    <p class="guide-p">如果只考學科（部分考生分開報考），這個系統就夠用了。</p>
+  </div>
+
+  <div class="guide-section">
+    <div class="guide-badge">操作技巧</div>
+    <div class="guide-mode-row"><span class="guide-emo">👆</span><div><strong>手機滑動</strong> — Flashcard 左右滑換題，Quiz 左滑 = 下一題</div></div>
+    <div class="guide-mode-row"><span class="guide-emo">⬆️</span><div><strong>匯入新題庫</strong> — 未來有新年度題庫可從這裡匯入 JSON</div></div>
+    <div class="guide-mode-row"><span class="guide-emo">⬇️</span><div><strong>匯出紀錄</strong> — 備份答題進度，換手機時用</div></div>
+    <div class="guide-mode-row"><span class="guide-emo">⟲</span><div><strong>重置</strong> — 清除所有答題紀錄（題庫不會消失）</div></div>
+  </div>
+
+  <div class="bottom-actions">
+    <button class="btn primary" id="btn-guide-start">開始刷題</button>
+  </div>
 </div>
 
 <!-- ========= Quiz screen ========= -->
@@ -6753,9 +6832,14 @@ document.addEventListener('DOMContentLoaded',()=>{
   });
 
   // Header buttons
+  $('btn-guide').onclick=()=>show('guide-screen');
   $('btn-import').onclick=openImport;
   $('btn-export').onclick=openExport;
   $('btn-reset').onclick=openReset;
+
+  // Guide screen
+  $('btn-back-guide').onclick=()=>show('home-screen');
+  $('btn-guide-start').onclick=()=>show('home-screen');
 
   // Quiz actions
   $('btn-back').onclick=()=>{if(confirm('離開本輪？進度將不會儲存'))show('home-screen')};
