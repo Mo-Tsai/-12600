@@ -195,6 +195,22 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 
 footer{text-align:center;color:var(--muted-2);font-size:11px;padding:20px 0 10px;letter-spacing:.05em}
 
+/* ===== 術科 mode button tint ===== */
+.mode-jutsu{border-color:#3a3a46}
+.mode-jutsu:hover{border-color:#60a5fa;background:var(--surface-2)}
+
+/* ===== 術科 screen ===== */
+.jt-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:22px 18px;margin-bottom:14px;min-height:220px}
+.jt-meta{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+.jt-q{font-size:16px;font-weight:500;line-height:1.8;white-space:pre-wrap;color:var(--text);margin-bottom:16px}
+.jt-ans{border-top:1px dashed var(--border);padding-top:14px;animation:fadeIn .2s}
+.jt-ans-label{font-size:11px;color:var(--muted);font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px}
+.jt-ans-body{font-size:14px;line-height:1.8;color:var(--text);white-space:pre-wrap}
+.jt-reveal-btn{width:100%;padding:13px;background:var(--accent-dim);color:var(--accent);border:1px dashed var(--accent);border-radius:var(--radius);font-size:14px;font-weight:600;transition:all .15s;cursor:pointer;margin-top:4px}
+.jt-reveal-btn:hover{background:var(--accent);color:#000}
+.jt-reveal-btn.hidden{display:none!important}
+.jt-self{margin-bottom:8px}
+
 /* ===== Version tag ===== */
 .ver-tag{font-size:10px;color:var(--muted-2);background:var(--surface-2);border:1px solid var(--border);padding:2px 7px;border-radius:999px;font-weight:500;letter-spacing:.05em;flex-shrink:0}
 
@@ -275,6 +291,20 @@ footer{text-align:center;color:var(--muted-2);font-size:11px;padding:20px 0 10px
     </button>
   </div>
 
+  <div class="section-title">術科練習</div>
+  <div class="modes">
+    <button class="mode mode-jutsu" data-mode="jutsu-random">
+      <span class="emo">✏️</span>
+      <span class="ti">術科隨機</span>
+      <span class="ds">問答+繪圖 Flashcard，看題→想→看答案</span>
+    </button>
+    <button class="mode mode-jutsu" data-mode="jutsu-year">
+      <span class="emo">📅</span>
+      <span class="ti">依年度刷</span>
+      <span class="ds">選一年完整練 A、B、C 三卷</span>
+    </button>
+  </div>
+
   <div id="cat-panel" class="hidden">
     <div class="section-title">選擇類別</div>
     <div class="cats" id="cat-list"></div>
@@ -282,7 +312,7 @@ footer{text-align:center;color:var(--muted-2);font-size:11px;padding:20px 0 10px
 
   <div class="section-title">📊 分類表現</div>
   <div class="cats" id="cat-stats"></div>
-  <footer>v1.0 · 109–112 年考古題 · 320 題</footer>
+  <footer>v1.2 · 學科 320 題 · 術科收錄中</footer>
 </div>
 
 <!-- ========= Guide screen ========= -->
@@ -417,6 +447,55 @@ footer{text-align:center;color:var(--muted-2);font-size:11px;padding:20px 0 10px
   <div class="bottom-actions">
     <button class="btn" id="btn-home">回首頁</button>
     <button class="btn primary" id="btn-retry">再來一輪</button>
+  </div>
+</div>
+
+<!-- ========= 術科 screen ========= -->
+<div id="jutsu-screen" class="screen hidden">
+  <header class="topbar">
+    <button class="icon-btn" id="btn-back-jutsu">←</button>
+    <div style="flex:1">
+      <div style="font-size:13px;font-weight:700" id="jt-title">術科練習</div>
+      <div style="font-size:11px;color:var(--muted)" id="jt-progress">—</div>
+    </div>
+    <span class="ver-tag" id="jt-section-tag">—</span>
+  </header>
+
+  <div class="jt-card" id="jt-card">
+    <div class="jt-meta">
+      <span class="qtag cat" id="jt-cat">—</span>
+      <span class="qtag" id="jt-year-tag">—</span>
+    </div>
+    <div class="jt-q" id="jt-q">—</div>
+    <div class="jt-ans hidden" id="jt-ans">
+      <div class="jt-ans-label">參考答案</div>
+      <div class="jt-ans-body" id="jt-ans-body">—</div>
+    </div>
+    <button class="jt-reveal-btn" id="jt-reveal">點我看答案</button>
+  </div>
+
+  <div class="jt-self hidden" id="jt-self">
+    <div style="font-size:12px;color:var(--muted);text-align:center;margin-bottom:10px">誠實評估自己：</div>
+    <div style="display:flex;gap:8px">
+      <button class="btn" style="flex:1;background:var(--wrong-dim);color:var(--wrong);border-color:var(--wrong)" id="jt-no">不會 ✗</button>
+      <button class="btn" style="flex:1" id="jt-maybe">模糊 ？</button>
+      <button class="btn" style="flex:1;background:var(--correct-dim);color:var(--correct);border-color:var(--correct)" id="jt-yes">會了 ✓</button>
+    </div>
+  </div>
+
+  <div class="bottom-actions">
+    <button class="btn" id="jt-prev">← 上一題</button>
+    <button class="btn primary" id="jt-next">下一題 →</button>
+  </div>
+</div>
+
+<!-- 術科 年度選擇 modal -->
+<div id="jutsu-year-modal" class="modal-bg hidden">
+  <div class="modal">
+    <h2>選擇年度</h2>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:14px">選擇要練習的考試年度（A + B + C 三卷）</p>
+    <div id="jutsu-year-list" style="display:flex;flex-direction:column;gap:8px"></div>
+    <div class="modal-actions"><button class="btn" id="jutsu-year-close">取消</button></div>
   </div>
 </div>
 
@@ -6327,6 +6406,96 @@ const STARTER_BANK = [
 ];
 
 /* =====================================================
+   術科題庫 JUTSU_BANK
+   格式：{id, year, section:"A"|"B"|"C", q_num, cat, q, ans}
+   ===================================================== */
+const JUTSU_BANK = [
+  /* ── 109 年 A 卷 ── */
+  {id:"109-sA01",year:109,section:"A",q_num:1,cat:"圖說判讀",
+   q:"依據 CNS 建築製圖標準，試說明下列線條種類及用途：\n① 粗實線　② 細虛線　③ 一點鏈線（中心線）　④ 折斷線",
+   ans:"① 粗實線：可見輪廓線、剖切線（最粗）\n② 細虛線：隱藏線，表示被遮蔽之稜線或輪廓\n③ 一點鏈線：中心線、對稱線、基準線（細，交替長短線）\n④ 折斷線：圖形省略折斷處，表示圖形不完整"},
+  {id:"109-sA02",year:109,section:"A",q_num:2,cat:"丈量放樣",
+   q:"室內裝修工程施工前為何需要丈量現場？請列舉 4 項丈量目的。",
+   ans:"① 確認設計圖尺寸與現況是否相符\n② 掌握柱樑、管道間等結構位置\n③ 計算材料需求數量，準確估價\n④ 確認門窗、開口尺寸，規劃施工順序"},
+  {id:"109-sA03",year:109,section:"A",q_num:3,cat:"管理-估算",
+   q:"試計算下列工程數量：\n一間客廳地坪面積長 5.5 m × 寬 4.2 m，扣除一根柱子 0.5 m × 0.5 m。\n① 計算實鋪面積（m²）\n② 換算為幾坪（1 坪 = 3.3058 m²，取小數點第 2 位）",
+   ans:"① 實鋪面積 = (5.5 × 4.2) − (0.5 × 0.5) = 23.1 − 0.25 = 22.85 m²\n② 換算坪數 = 22.85 ÷ 3.3058 ≈ 6.91 坪"},
+  {id:"109-sA04",year:109,section:"A",q_num:4,cat:"法規-室裝辦法",
+   q:"依「建築物室內裝修管理辦法」規定，下列何種情況需申請室內裝修許可？請列舉 3 種需申請的情況。",
+   ans:"① 供公眾使用建築物（含辦公室、餐廳等）之室內裝修\n② 六層以上建築物之室內裝修\n③ 變更主要構造（如分間牆位置移動、增減開口）之裝修工程\n（另：需由開業建築師或室裝專業設計技術人員設計及申請）"},
+  {id:"109-sA05",year:109,section:"A",q_num:5,cat:"管理-進度",
+   q:"請說明施工進度管理中「要徑法（CPM）」的意義，並說明「浮時（Float）」是什麼。",
+   ans:"要徑法（CPM）：將工程各作業按邏輯關係排列，找出工期最長的路徑（要徑），要徑上的作業若延誤即導致總工期延誤。\n浮時：非要徑作業可延遲而不影響總工期的時間餘裕。浮時 = 最晚開始時間（LS）− 最早開始時間（ES）"},
+
+  /* ── 109 年 B 卷 ── */
+  {id:"109-sB01",year:109,section:"B",q_num:1,cat:"法規-建技規",
+   q:"依「建築技術規則」規定，建築物之防火區劃面積限制為何？並說明什麼情況可以放寬？",
+   ans:"一般防火區劃面積：1,500 m²以下（地上層）\n放寬情況：設有自動撒水設備者得放寬 2 倍（3,000 m²）；地下層為 1,000 m²，設撒水設備得放寬為 2,000 m²"},
+  {id:"109-sB02",year:109,section:"B",q_num:2,cat:"共同-職安",
+   q:"室內裝修工程中，作業人員使用砂輪機時應注意哪些安全事項？請列舉 5 項。",
+   ans:"① 使用前確認砂輪無裂痕、破損\n② 安裝護罩，調整至正確角度\n③ 配戴護目鏡、防護面罩\n④ 砂輪轉動時不可側面施力\n⑤ 更換砂輪前應確認電源已切斷，並等砂輪完全停止"},
+  {id:"109-sB03",year:109,section:"B",q_num:3,cat:"施工機具",
+   q:"試說明「手提電鑽」與「電動起子機」的主要差異及各自適用場合。",
+   ans:"手提電鑽：主要用於鑽孔作業，扭力大，適合混凝土、磚牆鑽孔（含震動模式）\n電動起子機：主要用於鎖螺絲，有扭力控制（離合器），可調段數，避免過度鎖緊，適合輕隔間、木作組裝"},
+  {id:"109-sB04",year:109,section:"B",q_num:4,cat:"施工-泥作",
+   q:"試說明陶瓷面磚牆面施工的程序（5 個主要步驟）及打底砂漿的正確配比。",
+   ans:"施工程序：① 基面清潔整平 → ② 放樣彈線（水平垂直基準） → ③ 打底（粗底層，1:3水泥砂漿） → ④ 貼磚（黏著劑或硬底貼法） → ⑤ 填縫（嵌縫劑）\n打底砂漿配比：水泥 1 份：砂 3 份（容積比）"},
+  {id:"109-sB05",year:109,section:"B",q_num:5,cat:"安全維護",
+   q:"工地應設置哪些安全警示設施？請列舉 5 項具體措施。",
+   ans:"① 工地四周設置安全圍籬（高度不低於 1.8 m）\n② 出入口設置警示燈或反光標誌\n③ 危險區域設置警告標誌牌\n④ 安全網或防落物設施\n⑤ 夜間施工設置照明設備"},
+
+  /* ── 109 年 C 卷 ── */
+  {id:"109-sC01",year:109,section:"C",q_num:1,cat:"施工-木作",
+   q:"試說明木作天花板施工程序（由放樣到封板共 6 個步驟）。",
+   ans:"① 依設計圖定天花板完成面高度，放樣彈水平線\n② 沿牆四周固定邊料（L 型鍍鋅角料）\n③ 固定吊筋（與樓板錨固，間距 90 cm 以內）\n④ 安裝縱向主料（主骨）\n⑤ 安裝橫向副料（次骨），形成格柵\n⑥ 封板（矽酸鈣板、石膏板等），預留伸縮縫"},
+  {id:"109-sC02",year:109,section:"C",q_num:2,cat:"施工-輕隔間",
+   q:"輕鋼架輕隔間牆的標準施工流程為何？請列舉 6 個步驟。",
+   ans:"① 放樣：依設計圖在地面、牆面彈墨線定位\n② 固定上下槽鐵（天地軌）\n③ 安裝立柱（Stud），間距 40~60 cm\n④ 門窗開口處加裝補強立柱\n⑤ 填充岩綿（隔音/防火）\n⑥ 封矽酸鈣板或石膏板，接縫處貼玻纖網布批土"},
+  {id:"109-sC03",year:109,section:"C",q_num:3,cat:"施工-塗裝",
+   q:"室內牆面乳膠漆施工應包含哪些程序？請說明完整步驟（至少 5 步）。",
+   ans:"① 基面處理：清除粉塵、油污，修補裂縫\n② 批土（第一道）：填補凹洞\n③ 研磨：乾燥後以砂紙打磨平整\n④ 批土（第二道）：全面薄批，再研磨\n⑤ 底漆：增加附著力\n⑥ 面漆（第一道）\n⑦ 研磨（輕磨）\n⑧ 面漆（第二道）"},
+  {id:"109-sC04",year:109,section:"C",q_num:4,cat:"施工-水電",
+   q:"室內裝修水電管線配置時，有哪些基本原則需要遵守？請列舉 5 項。",
+   ans:"① 強弱電分管，不共管（避免電磁干擾）\n② 水管與電管保持適當距離，水管在下\n③ 配管轉彎半徑不得過小，避免拉線困難\n④ 穿越防火區劃處需做防火填塞\n⑤ 施工前確認與結構樑柱鋼筋位置，避免鑽壞結構"},
+  {id:"109-sC05",year:109,section:"C",q_num:5,cat:"圖說判讀",
+   q:"請說明室內裝修施工圖中，平面圖（FL 圖）與天花板圖（CH 圖）各需標示哪些主要內容？",
+   ans:"平面圖（FL）：① 各空間尺寸與隔間位置 ② 門窗位置及開口方向 ③ 家具配置 ④ 地坪材料分界 ⑤ 電插座、燈具開關位置\n天花板圖（CH）：① 天花板造型輪廓及高度 ② 燈具位置及種類 ③ 冷氣出回風口 ④ 灑水頭、偵煙器位置 ⑤ 天花板材料標示"},
+
+  /* ── 110 年 A 卷 ── */
+  {id:"110-sA01",year:110,section:"A",q_num:1,cat:"圖說判讀",
+   q:"請說明室內裝修施工圖常用比例尺，並說明各比例尺適用的圖種。",
+   ans:"1/100：配置圖、平面圖（整體空間概覽）\n1/50：平面圖、立面圖（一般施工圖）\n1/30：立面圖（細部設計）\n1/20、1/10：大樣詳圖、節點圖（施工細部）\n1/5、1/2：特殊細部大樣、五金配件"},
+  {id:"110-sA02",year:110,section:"A",q_num:2,cat:"管理-估算",
+   q:"請計算以下油漆工程用料：\n房間四面牆壁，各尺寸如下（扣除開口）：\n南北牆各 4m×2.8m，扣除門洞 0.9m×2.1m 一個\n東西牆各 3.5m×2.8m，扣除窗洞 1.5m×1.2m 一個\n①計算總塗裝面積　②若每桶油漆可刷 25m²（兩道），需幾桶？（進位取整）",
+   ans:"① 南牆=4×2.8−0.9×2.1=11.2−1.89=9.31m²；北牆同=9.31m²\n東牆=3.5×2.8−1.5×1.2=9.8−1.8=8.0m²；西牆同=8.0m²\n總面積=9.31×2+8.0×2=18.62+16=34.62m²\n② 34.62÷25=1.38 → 需購 2 桶"},
+  {id:"110-sA03",year:110,section:"A",q_num:3,cat:"法規-室裝辦法",
+   q:"依「建築物室內裝修管理辦法」，室內裝修竣工後，應辦理何種程序？請依序說明。",
+   ans:"① 施工完成後，由專業施工技術人員或承造人會同申請人，向原申請主管機關申請竣工查驗\n② 備齊竣工圖說（含平面圖、立面圖、材料說明）\n③ 主管機關派員查驗，確認符合核准圖說及法規\n④ 查驗合格後，核發室內裝修合格證明"},
+  {id:"110-sA04",year:110,section:"A",q_num:4,cat:"丈量放樣",
+   q:"說明何謂「水平放樣」，並列舉 3 種常用的水平放樣工具及其使用方式。",
+   ans:"水平放樣：在施工現場建立水平基準線，作為天花板高度、地坪完成面等施工依據。\n工具：\n① 水準管（水泡尺）：氣泡居中表示水平\n② 雷射水平儀：投射水平雷射線，精確快速\n③ 水線（管水準器）：利用連通管原理，兩端水面等高"},
+  {id:"110-sA05",year:110,section:"A",q_num:5,cat:"管理-進度",
+   q:"何謂「甘特圖（Gantt Chart）」？其優缺點各為何？",
+   ans:"甘特圖：以橫條圖表示各項工作的起始、結束時間與持續期間，縱軸為工作項目，橫軸為時間。\n優點：直觀易讀，一眼看出進度；製作簡單\n缺點：無法表示工作間的邏輯依存關係；工作項目多時不易管理（比不上 CPM）"},
+
+  /* ── 111 年 A 卷（節選）── */
+  {id:"111-sA01",year:111,section:"A",q_num:1,cat:"圖說判讀",
+   q:"請說明以下 CNS 建築設備圖符號代表什麼設備（至少答對 4 項得分）：\n① S　② EX　③ SD　④ SP　⑤ ES",
+   ans:"① S（Sprinkler）：自動撒水頭\n② EX（Exit Sign）：緊急出口標示燈\n③ SD（Smoke Detector）：偵煙探測器\n④ SP（Speaker）：廣播喇叭\n⑤ ES（Emergency Stop）：緊急停止按鈕"},
+  {id:"111-sA02",year:111,section:"A",q_num:2,cat:"管理-估算",
+   q:"請計算輕隔間牆工程數量：\n一道隔間牆長 8.5 m、高 2.8 m，其中有一扇門洞 0.9 m × 2.1 m。\n① 輕鋼架立柱（間距 40 cm）需幾支？\n② 矽酸鈣板（1.2m × 2.4m/片，單面）需幾片？",
+   ans:"① 立柱數量：8.5 ÷ 0.4 + 1 = 22.25 → 23 支（兩端各需一支，取進位）\n② 單面面積 = 8.5 × 2.8 − 0.9 × 2.1 = 23.8 − 1.89 = 21.91 m²\n每片面積 = 1.2 × 2.4 = 2.88 m²\n21.91 ÷ 2.88 = 7.6 → 需 8 片"},
+
+  /* ── 112 年 A 卷（節選）── */
+  {id:"112-sA01",year:112,section:"A",q_num:1,cat:"法規-建技規",
+   q:"依「建築技術規則」，室內裝修材料的耐燃等級分為哪幾級？各級的定義為何？",
+   ans:"耐燃一級（不燃材料）：混凝土、磚、鋼鐵等，完全不燃\n耐燃二級（耐火板）：石膏板、矽酸鈣板等，在規定時間內不起火\n耐燃三級（耐燃合板）：通過標準燃燒試驗，難以引燃\n（防焰材料：窗簾、地毯等需有防焰標示，非耐燃等級分類）"},
+  {id:"112-sA02",year:112,section:"A",q_num:2,cat:"管理-估算",
+   q:"地板鋪設木地板，房間尺寸 6.3 m × 4.5 m，木地板規格為 9 cm × 90 cm/片。\n① 計算房間面積（m²）\n② 計算需要幾片木地板？（損耗率加 10%，無條件進位）",
+   ans:"① 房間面積 = 6.3 × 4.5 = 28.35 m²\n② 每片面積 = 0.09 × 0.90 = 0.081 m²\n含損耗面積 = 28.35 × 1.1 = 31.185 m²\n片數 = 31.185 ÷ 0.081 = 384.9 → 需 385 片"},
+];
+
+/* =====================================================
    State & Storage
    ===================================================== */
 const LS_KEY = 'mo_12600_quiz_v1';
@@ -6363,6 +6532,21 @@ function resetState(){
 function $(id){return document.getElementById(id)}
 function el(tag,cls,txt){const e=document.createElement(tag);if(cls)e.className=cls;if(txt!=null)e.textContent=txt;return e}
 function shuffle(arr){const a=[...arr];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+/* 優先出沒刷過的題，刷完一圈才開始重複 */
+function smartPick(bank,log,n){
+  const tiers=[[],[],[]]; // 0=沒看過, 1=看過1次, 2=看過2次以上
+  bank.forEach(q=>{
+    const seen=(log[q.id]&&log[q.id].seen)||0;
+    if(seen===0)tiers[0].push(q);
+    else if(seen===1)tiers[1].push(q);
+    else tiers[2].push(q);
+  });
+  const pool=[];
+  for(const tier of tiers){
+    shuffle(tier).forEach(q=>{if(pool.length<n)pool.push(q);});
+  }
+  return pool;
+}
 function arrEq(a,b){if(a.length!==b.length)return false;const s=new Set(b);return a.every(x=>s.has(x))}
 function toast(msg,type=''){
   const t=el('div','toast'+(type?' '+type:''),msg);
@@ -6443,7 +6627,7 @@ function renderHome(){
    ===================================================== */
 function startQuiz(mode,cat){
   let pool=[];
-  if(mode==='random') pool=shuffle(state.bank).slice(0,Math.min(20,state.bank.length));
+  if(mode==='random') pool=smartPick(state.bank,state.log,20);
   else if(mode==='wrong'){
     const wids=getWrongIds();
     if(!wids.length){toast('目前沒有錯題 ✓','ok');return}
@@ -6816,6 +7000,98 @@ function openReset(){
 function closeModal(){$('modal-bg').classList.add('hidden')}
 
 /* =====================================================
+   術科 Flashcard 系統
+   ===================================================== */
+const jutsuLog={};  // id -> 'know'|'maybe'|'dunno'
+let jutsuSession={pool:[],idx:0};
+
+function startJutsu(pool){
+  if(!pool.length){toast('術科題庫尚無題目','no');return;}
+  jutsuSession={pool,idx:0};
+  show('jutsu-screen');
+  renderJutsu();
+}
+
+function openJutsuYearPicker(){
+  const years=[...new Set(JUTSU_BANK.map(q=>q.year))].sort();
+  const list=$('jutsu-year-list');
+  list.innerHTML='';
+  years.forEach(y=>{
+    const cnt=JUTSU_BANK.filter(q=>q.year===y).length;
+    const b=el('button','btn');
+    b.style.cssText='text-align:left;justify-content:space-between;display:flex;padding:13px 16px';
+    b.innerHTML=`<span>${y} 年</span><span style="color:var(--muted);font-size:12px">A+B+C 共 ${cnt} 題</span>`;
+    b.onclick=()=>{
+      $('jutsu-year-modal').classList.add('hidden');
+      startJutsu(JUTSU_BANK.filter(q=>q.year===y));
+    };
+    list.appendChild(b);
+  });
+  $('jutsu-year-modal').classList.remove('hidden');
+}
+
+function renderJutsu(){
+  const {pool,idx}=jutsuSession;
+  const q=pool[idx];
+  // header
+  $('jt-title').textContent=`術科練習`;
+  $('jt-progress').textContent=`${idx+1} / ${pool.length}`;
+  $('jt-section-tag').textContent=`${q.year}年 ${q.section}卷 Q${q.q_num}`;
+  // card
+  $('jt-cat').textContent=q.cat;
+  $('jt-year-tag').textContent=`${q.year} 年`;
+  $('jt-q').textContent=q.q;
+  // reset ans
+  $('jt-ans').classList.add('hidden');
+  $('jt-ans-body').textContent=q.ans||'（參考答案整理中）';
+  $('jt-reveal').classList.remove('hidden');
+  $('jt-self').classList.add('hidden');
+  // show existing self-assessment
+  const status=jutsuLog[q.id];
+  if(status){
+    $('jt-ans').classList.remove('hidden');
+    $('jt-reveal').classList.add('hidden');
+    $('jt-self').classList.remove('hidden');
+    // tint based on status
+    const colors={know:'var(--correct)',maybe:'var(--muted)',dunno:'var(--wrong)'};
+    $('jt-card').style.borderColor=colors[status]||'var(--border)';
+  }else{
+    $('jt-card').style.borderColor='var(--border)';
+  }
+}
+
+function revealJutsuAns(){
+  $('jt-ans').classList.remove('hidden');
+  $('jt-reveal').classList.add('hidden');
+  $('jt-self').classList.remove('hidden');
+}
+
+function jutsuSelf(status){
+  const q=jutsuSession.pool[jutsuSession.idx];
+  jutsuLog[q.id]=status;
+  const colors={know:'var(--correct)',maybe:'var(--muted)',dunno:'var(--wrong)'};
+  $('jt-card').style.borderColor=colors[status];
+  setTimeout(jutsuNext,300);
+}
+
+function jutsuNext(){
+  if(jutsuSession.idx<jutsuSession.pool.length-1){
+    jutsuSession.idx++;renderJutsu();
+  }else{
+    // 完成小結
+    const pool=jutsuSession.pool;
+    const know=pool.filter(q=>jutsuLog[q.id]==='know').length;
+    const dunno=pool.filter(q=>jutsuLog[q.id]==='dunno').length;
+    toast(`術科完成 ✓ 會了 ${know} 題，不會 ${dunno} 題`,'ok');
+    show('home-screen');renderHome();
+  }
+}
+
+function jutsuPrev(){
+  if(jutsuSession.idx>0){jutsuSession.idx--;renderJutsu();}
+}
+
+/* =====================================================
    Wiring
    ===================================================== */
 document.addEventListener('DOMContentLoaded',()=>{
@@ -6840,6 +7116,33 @@ document.addEventListener('DOMContentLoaded',()=>{
   // Guide screen
   $('btn-back-guide').onclick=()=>show('home-screen');
   $('btn-guide-start').onclick=()=>show('home-screen');
+
+  // 術科 buttons on home
+  document.querySelectorAll('.mode-jutsu').forEach(b=>{
+    b.onclick=()=>{
+      const m=b.dataset.mode;
+      if(m==='jutsu-random') startJutsu(shuffle(JUTSU_BANK));
+      else openJutsuYearPicker();
+    };
+  });
+
+  // 術科 screen wiring
+  $('btn-back-jutsu').onclick=()=>show('home-screen');
+  $('jt-reveal').onclick=revealJutsuAns;
+  $('jt-yes').onclick=()=>jutsuSelf('know');
+  $('jt-maybe').onclick=()=>jutsuSelf('maybe');
+  $('jt-no').onclick=()=>jutsuSelf('dunno');
+  $('jt-next').onclick=jutsuNext;
+  $('jt-prev').onclick=jutsuPrev;
+  $('jutsu-year-close').onclick=()=>$('jutsu-year-modal').classList.add('hidden');
+
+  // Touch swipe for 術科
+  document.addEventListener('touchend',(e)=>{
+    const jutsuActive=!$('jutsu-screen').classList.contains('hidden');
+    if(!jutsuActive) return;
+    const dx=e.changedTouches[0].clientX-_tx;
+    if(Math.abs(dx)>50){dx<0?jutsuNext():jutsuPrev();}
+  },{passive:true});
 
   // Quiz actions
   $('btn-back').onclick=()=>{if(confirm('離開本輪？進度將不會儲存'))show('home-screen')};
