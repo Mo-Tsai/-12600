@@ -195,6 +195,11 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 
 footer{text-align:center;color:var(--muted-2);font-size:11px;padding:20px 0 10px;letter-spacing:.05em}
 
+/* ===== CNS Symbol display ===== */
+.cns-sym{margin:12px 0 4px;padding:12px 16px;background:var(--surface-3);border:1px solid var(--border-2);border-radius:8px;display:flex;flex-direction:column;align-items:flex-start;gap:4px}
+.cns-sym-label{font-size:10px;color:var(--muted);letter-spacing:.08em;font-weight:600;text-transform:uppercase;margin-bottom:4px}
+.cns-sym svg{display:block}
+
 /* ===== 術科 mode button tint ===== */
 .mode-jutsu{border-color:#3a3a46}
 .mode-jutsu:hover{border-color:#60a5fa;background:var(--surface-2)}
@@ -241,8 +246,8 @@ footer{text-align:center;color:var(--muted-2);font-size:11px;padding:20px 0 10px
 <!-- ========= Home screen ========= -->
 <div id="home-screen" class="screen">
   <header class="topbar">
-    <h1>🧾 乙級室裝 12600<span class="tag-mo">· Mo</span></h1>
-    <span class="ver-tag">v1.4</span>
+    <h1><svg width="22" height="22" viewBox="0 0 22 22" fill="none" style="vertical-align:-4px;margin-right:5px" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="16" width="12" height="3" rx="1" fill="#f59e0b"/><rect x="2" y="15.5" width="12" height="1" fill="#fbbf24"/><line x1="3" y1="16" x2="3" y2="19" stroke="#b45309" stroke-width=".6"/><line x1="6" y1="16" x2="6" y2="19" stroke="#b45309" stroke-width=".6"/><line x1="9" y1="16" x2="9" y2="19" stroke="#b45309" stroke-width=".6"/><line x1="12" y1="16" x2="12" y2="19" stroke="#b45309" stroke-width=".6"/><rect x="13.5" y="3" width="3" height="13" rx="1" transform="rotate(45 13.5 3)" fill="#ececef"/><rect x="14.8" y="2.2" width="3" height="3" rx=".5" transform="rotate(45 14.8 2.2)" fill="#f59e0b"/><line x1="15.5" y1="15.5" x2="18" y2="18" stroke="#f59e0b" stroke-width="1.5" stroke-linecap="round"/></svg>乙級室裝 12600<span class="tag-mo">· Mo</span></h1>
+    <span class="ver-tag">v1.5</span>
     <button class="icon-btn" id="btn-guide" title="使用說明">?</button>
     <button class="icon-btn" id="btn-import" title="匯入題庫">⬆️</button>
     <button class="icon-btn" id="btn-export" title="匯出紀錄">⬇️</button>
@@ -312,7 +317,7 @@ footer{text-align:center;color:var(--muted-2);font-size:11px;padding:20px 0 10px
 
   <div class="section-title">📊 分類表現</div>
   <div class="cats" id="cat-stats"></div>
-  <footer>v1.4 · 學科 320 題 · 術科 15 題</footer>
+  <footer>v1.5 · 學科 320 題 · 術科 15 題</footer>
 </div>
 
 <!-- ========= Guide screen ========= -->
@@ -636,6 +641,7 @@ const STARTER_BANK = [
       "C"
     ],
     "hint": "",
+    "sym": "<svg width='240' height='38' viewBox='0 0 240 38' xmlns='http://www.w3.org/2000/svg'><line x1='0' y1='19' x2='240' y2='19' stroke='#ececef' stroke-width='2.5'/><rect x='38' y='7' width='22' height='22' fill='#272731'/><text x='49' y='24' text-anchor='middle' fill='#f59e0b' font-size='15' font-family='monospace' font-weight='bold'>W</text><rect x='118' y='7' width='22' height='22' fill='#272731'/><text x='129' y='24' text-anchor='middle' fill='#f59e0b' font-size='15' font-family='monospace' font-weight='bold'>W</text><rect x='198' y='7' width='22' height='22' fill='#272731'/><text x='209' y='24' text-anchor='middle' fill='#f59e0b' font-size='15' font-family='monospace' font-weight='bold'>W</text></svg>",
     "src": "109年學科試題"
   },
   {
@@ -2575,6 +2581,7 @@ const STARTER_BANK = [
       "D"
     ],
     "hint": "",
+    "sym": "<svg width='90' height='56' viewBox='0 0 90 56' xmlns='http://www.w3.org/2000/svg'><rect x='4' y='4' width='82' height='48' stroke='#ececef' stroke-width='2.5' fill='none'/><rect x='4' y='4' width='82' height='48' stroke='#ececef' stroke-width='1' fill='none' rx='1'/><text x='45' y='34' text-anchor='middle' fill='#f59e0b' font-size='17' font-family='monospace' font-weight='bold'>LP</text></svg>",
     "src": "110年學科試題"
   },
   {
@@ -2701,6 +2708,7 @@ const STARTER_BANK = [
       "A"
     ],
     "hint": "",
+    "sym": "<svg width='70' height='70' viewBox='0 0 70 70' xmlns='http://www.w3.org/2000/svg'><circle cx='35' cy='35' r='28' stroke='#ececef' stroke-width='2.5' fill='none'/><line x1='35' y1='7' x2='35' y2='63' stroke='#ececef' stroke-width='1.5'/><text x='35' y='42' text-anchor='middle' fill='#f59e0b' font-size='20' font-family='monospace' font-weight='bold'>W</text></svg>",
     "src": "110年學科試題"
   },
   {
@@ -4285,6 +4293,7 @@ const STARTER_BANK = [
       "B"
     ],
     "hint": "",
+    "sym": "<svg width='240' height='38' viewBox='0 0 240 38' xmlns='http://www.w3.org/2000/svg'><line x1='0' y1='19' x2='240' y2='19' stroke='#ececef' stroke-width='2' stroke-dasharray='5,4'/><rect x='38' y='7' width='22' height='22' fill='#272731'/><text x='49' y='24' text-anchor='middle' fill='#60a5fa' font-size='15' font-family='monospace' font-weight='bold'>V</text><rect x='118' y='7' width='22' height='22' fill='#272731'/><text x='129' y='24' text-anchor='middle' fill='#60a5fa' font-size='15' font-family='monospace' font-weight='bold'>V</text><rect x='198' y='7' width='22' height='22' fill='#272731'/><text x='209' y='24' text-anchor='middle' fill='#60a5fa' font-size='15' font-family='monospace' font-weight='bold'>V</text></svg>",
     "src": "111年學科試題"
   },
   {
@@ -5182,6 +5191,7 @@ const STARTER_BANK = [
       "D"
     ],
     "hint": "",
+    "sym": "<svg width='240' height='38' viewBox='0 0 240 38' xmlns='http://www.w3.org/2000/svg'><line x1='0' y1='19' x2='240' y2='19' stroke='#ef4444' stroke-width='2.5'/><line x1='30' y1='10' x2='50' y2='28' stroke='#ef4444' stroke-width='2'/><line x1='110' y1='10' x2='130' y2='28' stroke='#ef4444' stroke-width='2'/><line x1='190' y1='10' x2='210' y2='28' stroke='#ef4444' stroke-width='2'/></svg>",
     "src": "112年學科試題"
   },
   {
@@ -6634,7 +6644,11 @@ function renderQuestion(){
   $('q-type').textContent=q.type==='multi'?'複選':'單選';
   $('q-src').textContent=q.src||'';
   $('q-trap-tag').classList.toggle('hidden',!q.trap);
-  $('q-text').textContent=q.q;
+  if(q.sym){
+    $('q-text').innerHTML=q.q+`<div class="cns-sym"><span class="cns-sym-label">題目附圖 · CNS 符號</span>${q.sym}</div>`;
+  }else{
+    $('q-text').textContent=q.q;
+  }
 
   const opts=$('q-opts');
   opts.innerHTML='';
